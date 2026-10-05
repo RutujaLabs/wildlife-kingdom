@@ -1,11 +1,13 @@
 <?php
-$pageCss = ['pages.css', 'animals.css'];
+$pageCss = 'animals.css';
 require '../config/db.php';
+require '../includes/functions.php';
+animal_ensure_table($conn);
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $animal = null;
 
-$stmt = $conn->prepare("SELECT * FROM animals WHERE id = ?");
+$stmt = $conn->prepare("SELECT a.*, h.name AS habitat FROM animals a LEFT JOIN habitats h ON h.id = a.habitat_id WHERE a.id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -42,6 +44,7 @@ require '../includes/header.php';
 
         <div class="detail-facts">
           <div><span>Species</span><strong><?php echo htmlspecialchars($animal['species']); ?></strong></div>
+          <div><span>Habitat</span><strong><?php echo htmlspecialchars($animal['habitat']); ?></strong></div>
           <div><span>Diet</span><strong><?php echo htmlspecialchars($animal['diet']); ?></strong></div>
           <div><span>Lifespan</span><strong><?php echo htmlspecialchars($animal['lifespan']); ?></strong></div>
           <div><span>Status</span><strong><?php echo htmlspecialchars($animal['conservation_status']); ?></strong></div>

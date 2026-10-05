@@ -1,12 +1,14 @@
 <?php
 $pageTitle = 'Animals';
-$pageCss = ['pages.css', 'animals.css'];
-require '../includes/header.php';
+$pageCss = 'animals.css';
 require '../config/db.php';
+require '../includes/functions.php';
+animal_ensure_table($conn);
 
 $animals = [];
-$result = $conn->query("SELECT * FROM animals ORDER BY name ASC");
+$result = $conn->query("SELECT a.id, a.name, a.scientific_name, a.description, a.image, a.conservation_status FROM animals a ORDER BY a.name ASC");
 if ($result) { while ($row = $result->fetch_assoc()) { $animals[] = $row; } }
+require '../includes/header.php';
 ?>
 
 <section class="page-hero">
