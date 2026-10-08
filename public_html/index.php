@@ -193,11 +193,6 @@ footer a:hover, .site-footer a:hover, .footer a:hover { color: var(--sw-gold); }
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .wk-hero, .wk-hero * { box-sizing: border-box; }
-.wk-hero::before {               /* soft warm glow */
-  content: ""; position: absolute; right: -120px; top: -140px;
-  width: 460px; height: 460px; pointer-events: none;
-  background: radial-gradient(circle, rgba(232,161,91,.26), transparent 68%);
-}
 .wk-hero-grid {
   position: relative; z-index: 1;
   display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 27vw, 460px);
@@ -234,7 +229,6 @@ footer a:hover, .site-footer a:hover, .footer a:hover { color: var(--sw-gold); }
 }
 .wk-hero h1 em {
   font-style: normal; white-space: nowrap;
-  background: linear-gradient(transparent 66%, rgba(200,155,60,.5) 66%);
 }
 .wk-lead {
   max-width: none; margin: 0 0 22px;
@@ -346,11 +340,6 @@ section.section.wk-explore.wk-explore {
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .wk-explore, .wk-explore * { box-sizing: border-box; }
-.wk-explore::before {            /* soft warm glow, bottom-left */
-  content: ""; position: absolute; left: -140px; bottom: -160px;
-  width: 460px; height: 460px; pointer-events: none;
-  background: radial-gradient(circle, rgba(232,161,91,.20), transparent 68%);
-}
 .wk-explore .wk-ex-grid.container {
   position: relative; z-index: 1;
   max-width: 100%;
@@ -447,11 +436,6 @@ section.section.wk-habitats.wk-habitats {
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .wk-habitats, .wk-habitats * { box-sizing: border-box; }
-.wk-habitats::before {            /* soft warm glow, top-right */
-  content: ""; position: absolute; right: -120px; top: -140px;
-  width: 460px; height: 460px; pointer-events: none;
-  background: radial-gradient(circle, rgba(232,161,91,.22), transparent 68%);
-}
 .wk-habitats .wk-hb-grid.container {
   position: relative; z-index: 1;
   max-width: 100%;
@@ -552,16 +536,6 @@ section.section.wk-habitats.wk-habitats {
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .wk-xp, .wk-xp * { box-sizing: border-box; }
-.wk-xp::before {                 /* warm glow, top-left */
-  content: ""; position: absolute; left: -120px; top: -150px;
-  width: 460px; height: 460px; pointer-events: none;
-  background: radial-gradient(circle, rgba(232,161,91,.20), transparent 68%);
-}
-.wk-xp::after {                  /* soft light, bottom-right */
-  content: ""; position: absolute; right: -140px; bottom: -160px;
-  width: 420px; height: 420px; pointer-events: none;
-  background: radial-gradient(circle, rgba(200,155,60,.16), transparent 68%);
-}
 .wk-xp .wk-xp-grid.container {
   position: relative; z-index: 1;
   max-width: 100%;
@@ -769,16 +743,6 @@ section.section.wk-habitats.wk-habitats {
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .wk-cv, .wk-cv * { box-sizing: border-box; }
-.wk-cv::before {                 /* soft warm glow, top-right (same as hero) */
-  content: ""; position: absolute; right: -120px; top: -140px;
-  width: 460px; height: 460px; pointer-events: none;
-  background: radial-gradient(circle, rgba(232,161,91,.26), transparent 68%);
-}
-.wk-cv::after {                  /* faint gold glow, bottom-left */
-  content: ""; position: absolute; left: -140px; bottom: -170px;
-  width: 420px; height: 420px; pointer-events: none;
-  background: radial-gradient(circle, rgba(200,155,60,.16), transparent 68%);
-}
 .wk-cv .wk-cv-wrap.container {
   position: relative; z-index: 1; max-width: 100%;
   padding-left: clamp(16px, 2.5vw, 36px);
@@ -925,16 +889,6 @@ section.section.wk-habitats.wk-habitats {
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .wk-fq, .wk-fq * { box-sizing: border-box; }
-.wk-fq::before {                 /* warm glow, bottom-left (same as section 2) */
-  content: ""; position: absolute; left: -140px; bottom: -160px;
-  width: 460px; height: 460px; pointer-events: none;
-  background: radial-gradient(circle, rgba(232,161,91,.20), transparent 68%);
-}
-.wk-fq::after {                  /* soft light, top-right */
-  content: ""; position: absolute; right: -140px; top: -160px;
-  width: 420px; height: 420px; pointer-events: none;
-  background: radial-gradient(circle, rgba(200,155,60,.16), transparent 68%);
-}
 .wk-fq .wk-fq-wrap.container {
   position: relative; z-index: 1; max-width: 100%;
   padding-left: clamp(16px, 2.5vw, 36px);
