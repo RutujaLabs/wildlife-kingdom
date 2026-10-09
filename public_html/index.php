@@ -2,8 +2,6 @@
 $pageTitle = 'Home';
 require '../includes/header.php';
 require '../config/db.php';
-require '../includes/functions.php';
-animal_ensure_table($conn);
 
 // ---- Fetch dynamic content from the database ----
 
@@ -18,10 +16,6 @@ if ($result) { while ($row = $result->fetch_assoc()) { $animals[] = $row; } }
 $events = [];
 $result = $conn->query("SELECT * FROM events ORDER BY event_date ASC LIMIT 2");
 if ($result) { while ($row = $result->fetch_assoc()) { $events[] = $row; } }
-
-$gallery = [];
-$result = $conn->query("SELECT * FROM gallery LIMIT 4");
-if ($result) { while ($row = $result->fetch_assoc()) { $gallery[] = $row; } }
 ?>
 
 <style>
