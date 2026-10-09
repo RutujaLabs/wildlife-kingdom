@@ -9,6 +9,9 @@
             <file>tests/Feature/AdminAuthFlowTest.php</file>
             <file>tests/Feature/AdminPanelTest.php</file>
         </testsuite>
+        <testsuite name="Public frontend pages">
+            <file>tests/Feature/FrontendPagesTest.php</file>
+        </testsuite>
     </testsuites>
     <source>
         <include>
