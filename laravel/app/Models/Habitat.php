@@ -18,7 +18,27 @@ class Habitat extends Model
         'image',
         'status',
         'climate',
+        'location',
+        'geographical_range',
+        'image_alt_text',
+        'image_caption',
+        'image_credit',
+        'meta_title',
+        'meta_description',
+        'canonical_url',
+        'noindex',
+        'is_homepage_visible',
+        'display_order',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'noindex' => 'boolean',
+            'is_homepage_visible' => 'boolean',
+            'display_order' => 'integer',
+        ];
+    }
 
     protected static function booted(): void
     {

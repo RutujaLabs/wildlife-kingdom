@@ -28,11 +28,24 @@ class EventController extends Controller
             'location' => ['required', 'string', 'max:255'],
             'event_date' => ['required', 'date'],
             'event_time' => ['nullable', 'string', 'max:50'],
+            'image_alt_text' => ['nullable', 'string', 'max:255'],
+            'image_caption' => ['nullable', 'string', 'max:2000'],
+            'image_credit' => ['nullable', 'string', 'max:255'],
+            'meta_title' => ['nullable', 'string', 'max:70'],
+            'meta_description' => ['nullable', 'string', 'max:320'],
+            'canonical_url' => ['nullable', 'url', 'max:2048'],
+            'noindex' => ['sometimes', 'boolean'],
+            'is_featured' => ['sometimes', 'boolean'],
+            'is_homepage_visible' => ['sometimes', 'boolean'],
+            'display_order' => ['nullable', 'integer', 'min:0', 'max:2147483647'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
             'status' => ['required', 'in:published,draft'],
         ]);
 
         $validated['image'] = $this->handleImageUpload($request, null);
+        $validated['noindex'] = $request->boolean('noindex');
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_homepage_visible'] = $request->boolean('is_homepage_visible', true);
 
         Event::create($validated);
 
@@ -52,11 +65,24 @@ class EventController extends Controller
             'location' => ['required', 'string', 'max:255'],
             'event_date' => ['required', 'date'],
             'event_time' => ['nullable', 'string', 'max:50'],
+            'image_alt_text' => ['nullable', 'string', 'max:255'],
+            'image_caption' => ['nullable', 'string', 'max:2000'],
+            'image_credit' => ['nullable', 'string', 'max:255'],
+            'meta_title' => ['nullable', 'string', 'max:70'],
+            'meta_description' => ['nullable', 'string', 'max:320'],
+            'canonical_url' => ['nullable', 'url', 'max:2048'],
+            'noindex' => ['sometimes', 'boolean'],
+            'is_featured' => ['sometimes', 'boolean'],
+            'is_homepage_visible' => ['sometimes', 'boolean'],
+            'display_order' => ['nullable', 'integer', 'min:0', 'max:2147483647'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
             'status' => ['required', 'in:published,draft'],
         ]);
 
         $validated['image'] = $this->handleImageUpload($request, $event->image);
+        $validated['noindex'] = $request->boolean('noindex');
+        $validated['is_featured'] = $request->boolean('is_featured');
+        $validated['is_homepage_visible'] = $request->boolean('is_homepage_visible', true);
 
         $event->update($validated);
 

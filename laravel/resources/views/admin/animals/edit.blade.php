@@ -122,6 +122,9 @@
         <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
         Back to animals
     </a>
+    @if($animal->exists)
+        <a href="{{ route('admin.animals.preview', $animal) }}" class="btn btn-outline" target="_blank" rel="noopener">Preview animal</a>
+    @endif
 </div>
 
 <form method="POST" action="{{ route('admin.animals.update', $animal) }}" enctype="multipart/form-data">
@@ -143,6 +146,15 @@
                         <label for="scientific_name">Scientific name</label>
                         <input id="scientific_name" name="scientific_name" type="text" value="{{ old('scientific_name', $animal->scientific_name) }}" class="@error('scientific_name') is-invalid @enderror">
                         @error('scientific_name')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="field">
+                        <label for="slug">URL slug</label>
+                        <input id="slug" name="slug" type="text" value="{{ old('slug', $animal->slug) }}" class="@error('slug') is-invalid @enderror">
+                        @error('slug')<div class="field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="field">
+                        <label for="short_description">Short description</label>
+                        <input id="short_description" name="short_description" type="text" maxlength="500" value="{{ old('short_description', $animal->short_description) }}">
                     </div>
                     <div class="field full">
                         <label for="description">Description <span class="req">*</span></label>
@@ -183,6 +195,7 @@
                     </div>
                 </div>
             </div>
+            @include('admin.animals._extended-fields')
         </div>
 
         <div class="edit-side">
@@ -212,6 +225,22 @@
                 <div class="img-meta" id="imgMeta"></div>
                 <div class="img-check" id="imgCheck"></div>
                 @error('image')<div class="field-error">{{ $message }}</div>@enderror
+                <div class="field">
+                    <label for="image_alt_text">Main image alt text</label>
+                    <input id="image_alt_text" name="image_alt_text" value="{{ old('image_alt_text', $animal->image_alt_text) }}">
+                </div>
+                <div class="field">
+                    <label for="image_caption">Main image caption</label>
+                    <input id="image_caption" name="image_caption" value="{{ old('image_caption', $animal->image_caption) }}">
+                </div>
+                <div class="field">
+                    <label for="image_credit">Main image credit</label>
+                    <input id="image_credit" name="image_credit" value="{{ old('image_credit', $animal->image_credit) }}">
+                </div>
+                <div class="field">
+                    <label for="image_source">Main image source</label>
+                    <input id="image_source" name="image_source" value="{{ old('image_source', $animal->image_source) }}">
+                </div>
 
                 <div class="size-guide">
                     <strong>Best image size</strong>
@@ -239,9 +268,17 @@
                         <div class="d">Highlight on the home page</div>
                     </div>
                     <div class="switch">
+                        <input type="hidden" name="is_featured" value="0">
                         <input name="is_featured" type="checkbox" value="1" {{ old('is_featured', $animal->is_featured) ? 'checked' : '' }} aria-label="Featured animal">
                         <span class="track"></span>
                     </div>
+                </div>
+                <div class="field" style="margin-top:16px;">
+                    <label for="display_order">Display order</label>
+                    <input id="display_order" name="display_order" type="number" min="0" value="{{ old('display_order', $animal->display_order) }}">
+                </div>
+                <div class="field">
+                    <label><input type="hidden" name="is_homepage_visible" value="0"><input name="is_homepage_visible" type="checkbox" value="1" {{ old('is_homepage_visible', $animal->is_homepage_visible) ? 'checked' : '' }}> Show on homepage</label>
                 </div>
 
                 <div class="form-actions">

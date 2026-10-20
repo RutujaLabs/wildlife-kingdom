@@ -15,10 +15,12 @@
     <div class="habitat-grid" data-reveal>
       @forelse($habitats as $habitat)
         <div class="habitat-card">
-          <img src="{{ $habitat->image ? Storage::url($habitat->image) : asset('assets/images/static/habitat-placeholder.jpg') }}" alt="{{ $habitat->name }}" onerror="this.src='{{ asset('assets/images/static/habitat-placeholder.jpg') }}'">
+          <img src="{{ $habitat->image ? Storage::url($habitat->image) : asset('assets/images/static/habitat-placeholder.jpg') }}" alt="{{ $habitat->image_alt_text ?: $habitat->name }}" onerror="this.src='{{ asset('assets/images/static/habitat-placeholder.jpg') }}'">
           <div class="habitat-overlay">
             <h3>{{ $habitat->name }}</h3>
             <span>{{ $habitat->short_description ?? 'Habitat experience' }}</span>
+            @if($habitat->climate)<span>{{ $habitat->climate }}</span>@endif
+            @if($habitat->location)<span>{{ $habitat->location }}</span>@endif
           </div>
         </div>
       @empty

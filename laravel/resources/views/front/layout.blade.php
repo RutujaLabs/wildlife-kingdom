@@ -3,7 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Wildlife Kingdom')</title>
+    <title>@yield('title', $siteSettings->get('seo_site_title', $siteSettings->get('site_name', 'Wildlife Kingdom')))</title>
+    @hasSection('meta-description')
+        <meta name="description" content="@yield('meta-description')">
+    @elseif($siteSettings->get('seo_site_description'))
+        <meta name="description" content="{{ $siteSettings->get('seo_site_description') }}">
+    @endif
+    @hasSection('canonical')
+        <link rel="canonical" href="@yield('canonical')">
+    @elseif($siteSettings->get('seo_canonical_base_url'))
+        <link rel="canonical" href="{{ rtrim($siteSettings->get('seo_canonical_base_url'), '/') }}/{{ ltrim(request()->getPathInfo(), '/') }}">
+    @endif
+    @hasSection('robots')
+        <meta name="robots" content="@yield('robots')">
+    @elseif($siteSettings->get('seo_default_noindex') || $siteSettings->get('seo_default_nofollow'))
+        <meta name="robots" content="{{ $siteSettings->get('seo_default_noindex') ? 'noindex' : 'index' }}, {{ $siteSettings->get('seo_default_nofollow') ? 'nofollow' : 'follow' }}">
+    @endif
+    @hasSection('social-title')
+        <meta property="og:title" content="@yield('social-title')">
+        <meta property="og:description" content="@yield('meta-description')">
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="@yield('canonical')">
+    @endif
+    @hasSection('social-image')
+        <meta property="og:image" content="@yield('social-image')">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="@yield('social-image')">
+    @endif
+    @stack('structured-data')
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +58,7 @@
 <header class="site-header">
     <div class="header-inner">
         <a href="{{ route('home') }}" class="logo">
-            <img src="{{ asset('assets/images/logo/wildlife-kingdom-header.png') }}" alt="Wildlife Kingdom">
+            <img src="{{ asset('assets/images/logo/wildlife-kingdom-header.png') }}" alt="{{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}">
         </a>
 
         <nav class="main-nav" id="mainNav">
@@ -60,9 +87,10 @@
     <div class="footer-inner">
         <div class="footer-brand">
             <a href="{{ route('home') }}" class="logo" aria-label="Wildlife Kingdom home">
-                <img src="{{ asset('assets/images/logo/wildlife-kingdom-header.png') }}" alt="Wildlife Kingdom">
+                <img src="{{ asset('assets/images/logo/wildlife-kingdom-header.png') }}" alt="{{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}">
             </a>
-            <p class="footer-about">A sanctuary for wonder, conservation, and discovery. Meet incredible animals, explore living habitats and connect with the natural world — every visit supports the wildlife we protect.</p>
+            <p class="footer-about">{{ $siteSettings->get('footer_about', 'A sanctuary for wonder, conservation, and discovery. Meet incredible animals, explore living habitats and connect with the natural world — every visit supports the wildlife we protect.') }}</p>
+            @if($siteSettings->get('site_tagline'))<p class="footer-about">{{ $siteSettings->get('site_tagline') }}</p>@endif
         </div>
 
         <div class="footer-links">
@@ -87,13 +115,15 @@
 
         <div class="footer-contact">
             <h4>Get in touch</h4>
-            <p>123 Rainforest Road<br>Wildlife County</p>
-            <p>hello@wildlifekingdom.com</p>
+            <p>{!! nl2br(e($siteSettings->get('contact_address', "123 Rainforest Road\nWildlife County"))) !!}</p>
+            <p>{{ $siteSettings->get('contact_email', 'hello@wildlifekingdom.com') }}</p>
+            @if($siteSettings->get('contact_phone'))<p>{{ $siteSettings->get('contact_phone') }}</p>@endif
+            @if($siteSettings->get('opening_hours'))<p>{!! nl2br(e($siteSettings->get('opening_hours'))) !!}</p>@endif
         </div>
     </div>
 
     <div class="footer-bottom">
-        <p>&copy; {{ date('Y') }} Wildlife Kingdom. All rights reserved.</p>
+        <p>&copy; {{ date('Y') }} {{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}. All rights reserved.</p>
     </div>
 </footer>
 

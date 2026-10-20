@@ -8,6 +8,9 @@
         <testsuite name="Admin authentication">
             <file>tests/Feature/AdminAuthFlowTest.php</file>
             <file>tests/Feature/AdminPanelTest.php</file>
+            <file>tests/Feature/AnimalContentTest.php</file>
+            <file>tests/Feature/ContentMetadataTest.php</file>
+            <file>tests/Feature/AdminContentWorkflowTest.php</file>
         </testsuite>
         <testsuite name="Public frontend pages">
             <file>tests/Feature/FrontendPagesTest.php</file>

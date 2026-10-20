@@ -37,8 +37,8 @@ class AdminAuthFlowTest extends TestCase
 
         $this->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('Total Animals')
-            ->assertSee('Total Habitats');
+            ->assertSee('Total animals')
+            ->assertSee('Total habitats');
     }
 
     public function test_admin_seeder_uses_explicit_credentials(): void

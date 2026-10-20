@@ -14,8 +14,8 @@
   <div class="container">
     <div class="gallery-grid" data-reveal>
       @forelse($gallery as $item)
-        <a href="#" aria-label="{{ $item->title }}">
-          <img src="{{ $item->image ? Storage::url($item->image) : asset('assets/images/static/gallery-placeholder.jpg') }}" alt="{{ $item->title }}" onerror="this.src='{{ asset('assets/images/static/gallery-placeholder.jpg') }}'">
+        <a href="#" aria-label="{{ $item->image_caption ?: $item->title }}">
+          <img src="{{ $item->image ? Storage::url($item->image) : asset('assets/images/static/gallery-placeholder.jpg') }}" alt="{{ $item->image_alt_text ?: $item->title }}" title="{{ $item->image_caption ?: $item->title }}" onerror="this.src='{{ asset('assets/images/static/gallery-placeholder.jpg') }}'">
         </a>
       @empty
         <p>No gallery images are available yet.</p>

@@ -26,11 +26,25 @@ class HabitatController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['required', 'string'],
             'short_description' => ['nullable', 'string', 'max:255'],
+            'climate' => ['nullable', 'string', 'max:150'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'geographical_range' => ['nullable', 'string', 'max:10000'],
+            'image_alt_text' => ['nullable', 'string', 'max:255'],
+            'image_caption' => ['nullable', 'string', 'max:2000'],
+            'image_credit' => ['nullable', 'string', 'max:255'],
+            'meta_title' => ['nullable', 'string', 'max:70'],
+            'meta_description' => ['nullable', 'string', 'max:320'],
+            'canonical_url' => ['nullable', 'url', 'max:2048'],
+            'noindex' => ['sometimes', 'boolean'],
+            'is_homepage_visible' => ['sometimes', 'boolean'],
+            'display_order' => ['nullable', 'integer', 'min:0', 'max:2147483647'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
             'status' => ['required', 'in:published,draft'],
         ]);
 
         $validated['image'] = $this->handleImageUpload($request, null);
+        $validated['noindex'] = $request->boolean('noindex');
+        $validated['is_homepage_visible'] = $request->boolean('is_homepage_visible', true);
 
         Habitat::create($validated);
 
@@ -48,11 +62,25 @@ class HabitatController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['required', 'string'],
             'short_description' => ['nullable', 'string', 'max:255'],
+            'climate' => ['nullable', 'string', 'max:150'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'geographical_range' => ['nullable', 'string', 'max:10000'],
+            'image_alt_text' => ['nullable', 'string', 'max:255'],
+            'image_caption' => ['nullable', 'string', 'max:2000'],
+            'image_credit' => ['nullable', 'string', 'max:255'],
+            'meta_title' => ['nullable', 'string', 'max:70'],
+            'meta_description' => ['nullable', 'string', 'max:320'],
+            'canonical_url' => ['nullable', 'url', 'max:2048'],
+            'noindex' => ['sometimes', 'boolean'],
+            'is_homepage_visible' => ['sometimes', 'boolean'],
+            'display_order' => ['nullable', 'integer', 'min:0', 'max:2147483647'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
             'status' => ['required', 'in:published,draft'],
         ]);
 
         $validated['image'] = $this->handleImageUpload($request, $habitat->image);
+        $validated['noindex'] = $request->boolean('noindex');
+        $validated['is_homepage_visible'] = $request->boolean('is_homepage_visible', true);
 
         $habitat->update($validated);
 

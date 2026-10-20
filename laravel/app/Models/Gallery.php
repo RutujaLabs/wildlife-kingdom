@@ -18,7 +18,21 @@ class Gallery extends Model
         'image',
         'category',
         'status',
+        'image_alt_text',
+        'image_caption',
+        'image_credit',
+        'image_source',
+        'is_homepage_visible',
+        'display_order',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_homepage_visible' => 'boolean',
+            'display_order' => 'integer',
+        ];
+    }
 
     public function getTable()
     {

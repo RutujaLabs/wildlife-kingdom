@@ -15,11 +15,12 @@
     <div class="grid-3" data-reveal>
       @forelse($animals as $animal)
         <div class="animal-card">
-          <img src="{{ $animal->image ? Storage::url($animal->image) : asset('assets/images/static/animal-placeholder.jpg') }}" alt="{{ $animal->name }}" onerror="this.src='{{ asset('assets/images/static/animal-placeholder.jpg') }}'">
+          <img src="{{ $animal->image ? Storage::url($animal->image) : asset('assets/images/static/animal-placeholder.jpg') }}" alt="{{ $animal->image_alt_text ?: $animal->name }}" onerror="this.src='{{ asset('assets/images/static/animal-placeholder.jpg') }}'">
           <div class="animal-card-body">
             <span class="status">{{ $animal->category ?? 'Wildlife' }}</span>
             <h3>{{ $animal->name }}</h3>
             <p class="sci">{{ $animal->scientific_name }}</p>
+            @if($animal->short_description)<p>{{ $animal->short_description }}</p>@endif
             <a href="{{ route('animal.show', $animal) }}">View Details &rarr;</a>
           </div>
         </div>

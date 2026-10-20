@@ -106,6 +106,10 @@
             <a href="{{ route('admin.habitats.index') }}" class="{{ request()->routeIs('admin.habitats.*') ? 'active' : '' }}">Habitats</a>
             <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}">Events</a>
             <a href="{{ route('admin.gallery.index') }}" class="{{ request()->routeIs('admin.gallery.*') ? 'active' : '' }}">Gallery</a>
+            <a href="{{ route('admin.settings.edit') }}" class="{{ request()->routeIs('admin.settings.edit', 'admin.settings.update') ? 'active' : '' }}">Pages &amp; Content</a>
+            <a href="{{ route('admin.settings.seo.edit') }}" class="{{ request()->routeIs('admin.settings.seo.*') ? 'active' : '' }}">SEO Settings</a>
+            <a href="{{ route('admin.settings.api.edit') }}" class="{{ request()->routeIs('admin.settings.api.*') ? 'active' : '' }}">API Settings</a>
+            <a href="{{ route('admin.settings.website.edit') }}" class="{{ request()->routeIs('admin.settings.website.*') ? 'active' : '' }}">Website Settings</a>
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn btn-secondary" style="width:100%;">Logout</button>

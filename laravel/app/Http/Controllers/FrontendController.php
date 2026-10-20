@@ -16,6 +16,11 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('animals', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->when(Schema::hasColumn('animals', 'is_homepage_visible'), function ($query) {
+                $query->where('is_homepage_visible', true);
+            })
+            ->orderByDesc('is_featured')
+            ->orderBy('display_order')
             ->orderBy('name')
             ->limit(4)
             ->get();
@@ -24,6 +29,10 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('habitats', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->when(Schema::hasColumn('habitats', 'is_homepage_visible'), function ($query) {
+                $query->where('is_homepage_visible', true);
+            })
+            ->orderBy('display_order')
             ->orderBy('name')
             ->limit(3)
             ->get();
@@ -32,7 +41,12 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('events', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->when(Schema::hasColumn('events', 'is_homepage_visible'), function ($query) {
+                $query->where('is_homepage_visible', true);
+            })
             ->where('event_date', '>=', now()->toDateString())
+            ->orderByDesc('is_featured')
+            ->orderBy('display_order')
             ->orderBy('event_date')
             ->limit(2)
             ->get();
@@ -41,6 +55,10 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('galleries', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->when(Schema::hasColumn('galleries', 'is_homepage_visible'), function ($query) {
+                $query->where('is_homepage_visible', true);
+            })
+            ->orderBy('display_order')
             ->latest()
             ->limit(4)
             ->get();
@@ -66,6 +84,13 @@ class FrontendController extends Controller
             abort(404);
         }
 
+        $animal->load([
+            'habitat',
+            'images',
+            'faqs',
+            'relatedAnimals' => fn ($query) => $query->where('status', 'published')->orderBy('name'),
+        ]);
+
         return view('front.animals.show', compact('animal'));
     }
 
@@ -75,6 +100,7 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('habitats', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->orderBy('display_order')
             ->orderBy('name')
             ->get();
 
@@ -87,6 +113,7 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('events', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->orderBy('display_order')
             ->orderBy('event_date', 'asc')
             ->get();
 
@@ -99,6 +126,7 @@ class FrontendController extends Controller
             ->when(Schema::hasColumn('galleries', 'status'), function ($query) {
                 $query->where('status', 'published');
             })
+            ->orderBy('display_order')
             ->latest()
             ->get();
 

@@ -50,8 +50,8 @@ class AdminPanelTest extends TestCase
 
         $this->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('Total Animals')
-            ->assertSee('Total Habitats');
+            ->assertSee('Total animals')
+            ->assertSee('Total habitats');
     }
 
     public function test_guest_is_redirected_to_admin_login(): void
