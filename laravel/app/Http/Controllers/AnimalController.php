@@ -83,6 +83,19 @@ class AnimalController extends Controller
     public function update(Request $request, Animal $animal)
     {
         $validated = $request->validate($this->validationRules($animal));
+        // Preserve existing values when optional fields are submitted as null
+$optionalFields = [
+    'habitat',
+    'species',
+    'diet',
+    'lifespan',
+];
+
+foreach ($optionalFields as $field) {
+    if (array_key_exists($field, $validated) && $validated[$field] === null) {
+        $validated[$field] = $animal->{$field};
+    }
+}
         $existingFaqs = $validated['faqs'] ?? [];
         $newFaqs = $validated['new_faqs'] ?? [];
         $existingImages = $validated['images'] ?? [];

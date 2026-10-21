@@ -1,391 +1,504 @@
 @extends('admin.layout')
 
-@section('title', 'Animal')
-@section('page-title', 'Animal')
+@section('title', 'Habitats')
+@section('page-title', 'Habitats')
 
 @push('styles')
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
-    .edit-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
-    .edit-head h2 { margin: 0; font-size: 1.25rem; font-weight: 600; color: var(--forest); }
-    .edit-head p { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
-    .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--forest); text-decoration: none; font-weight: 600; font-size: .92rem; }
-    .back-link svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-    .back-link:hover { text-decoration: underline; }
+    .hb-wrap { --hb-forest: #0f3d24; --hb-green: #1f7a4a; --hb-orange: #f28c1e; --hb-ink: #1d2b24; --hb-muted: #6f7a73; --hb-line: #ece8df; }
+    .hb-wrap * { box-sizing: border-box; }
 
-    .edit-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
-    .edit-main { display: flex; flex-direction: column; gap: 24px; }
-    .edit-side { display: flex; flex-direction: column; gap: 24px; position: sticky; top: 24px; }
+    /* ---------- Hero banner ---------- */
+    .hb-hero { position: relative; overflow: hidden; border-radius: 24px; padding: 26px 30px; margin-bottom: 18px; min-height: 150px; display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #eef3e4; box-shadow: 0 4px 20px rgba(30,45,36,.06); }
+    .hb-hero-art, .hb-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+    .hb-hero-img { object-fit: cover; }
+    .hb-hero::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, #f4f1e6 0%, rgba(244,241,230,.92) 28%, rgba(244,241,230,.35) 55%, rgba(244,241,230,0) 75%); }
+    .hb-hero > *:not(.hb-hero-art):not(.hb-hero-img) { position: relative; z-index: 2; }
 
-    .section-title { margin: 0 0 4px; font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--forest); }
-    .section-sub { margin: 0 0 20px; color: var(--muted); font-size: .88rem; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    .edit-layout .field { margin-bottom: 18px; }
-    .edit-layout .field:last-child { margin-bottom: 0; }
-    .edit-layout label { font-size: .9rem; color: #3d4a48; }
-    .req { color: #a12626; }
-    .hint { color: var(--muted); font-size: .8rem; margin-top: 6px; }
-    .field-error { color: #a12626; font-size: .82rem; margin-top: 6px; }
-    .is-invalid { border-color: #d46a6a !important; }
-    .edit-layout select { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236c6a69' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; padding-right: 38px; }
-    .edit-layout textarea { min-height: 170px; resize: vertical; line-height: 1.55; }
+    .hb-crumb { font-size: .95rem; color: var(--hb-muted); margin-bottom: 6px; }
+    .hb-crumb a { color: var(--hb-muted); text-decoration: none; }
+    .hb-crumb .current { color: var(--hb-forest); font-weight: 600; }
+    .hb-crumb .sep { margin: 0 8px; }
+    .hb-title { display: flex; align-items: center; gap: 12px; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 2.7rem; font-weight: 700; color: var(--hb-forest); line-height: 1.1; }
+    .hb-title svg { width: 30px; height: 30px; fill: #2c8a56; flex-shrink: 0; }
+    .hb-sub { margin: 6px 0 0; font-size: 1.05rem; color: #3f4c45; }
 
-    /* Image card */
-    .img-frame { position: relative; width: 100%; aspect-ratio: 3 / 2; border-radius: 14px; overflow: hidden; background: #f3eee5; border: 2px dashed #d9cfba; display: grid; place-items: center; transition: border-color .2s, background .2s; cursor: pointer; }
-    .img-frame.has-image { border-style: solid; border-color: var(--line); }
-    .img-frame.drag { border-color: var(--gold); background: #fcefdc; }
-    .img-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .img-placeholder { text-align: center; color: #9a8f78; padding: 16px; }
-    .img-placeholder svg { width: 40px; height: 40px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 8px; }
-    .img-placeholder div { font-size: .88rem; line-height: 1.4; }
-    .img-tag { position: absolute; left: 10px; top: 10px; background: rgba(11,47,34,.85); color: #fff; font-size: .74rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; z-index: 2; }
-    .img-tag.new { background: #14633f; }
-    .img-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-    .img-actions .btn { margin: 0; cursor: pointer; }
-    .file-input-hidden { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
-    .img-meta { font-size: .82rem; color: var(--muted); margin-top: 10px; word-break: break-word; }
-    .img-check { margin-top: 10px; font-size: .82rem; padding: 9px 12px; border-radius: 10px; display: none; line-height: 1.4; }
-    .img-check.ok { display: block; background: #e3f1e9; color: #14633f; }
-    .img-check.warn { display: block; background: #fcefdc; color: #8a5413; }
+    .hb-hero-right { display: flex; align-items: center; gap: 22px; flex-shrink: 0; }
+    .hb-quote { max-width: 190px; text-align: center; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 1.05rem; line-height: 1.35; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.45); }
+    .hb-add { display: inline-flex; align-items: center; gap: 10px; padding: 14px 26px; border-radius: 999px; background: #0d3b22; color: #fff; font-weight: 600; font-size: 1rem; text-decoration: none; white-space: nowrap; box-shadow: 0 6px 16px rgba(13,59,34,.3); transition: transform .15s, background .15s; }
+    .hb-add:hover { background: #0a2f1b; color: #fff; transform: translateY(-1px); }
+    .hb-add svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; }
 
-    .size-guide { margin-top: 16px; padding: 14px 16px; background: #faf7f2; border: 1px solid var(--line); border-radius: 12px; font-size: .84rem; color: #4f5654; }
-    .size-guide strong { color: var(--forest); }
-    .size-guide ul { margin: 8px 0 0; padding-left: 18px; line-height: 1.6; }
+    /* ---------- Stat cards ---------- */
+    .hb-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-bottom: 18px; }
+    .hb-stat { position: relative; overflow: hidden; display: flex; align-items: center; gap: 16px; padding: 20px 22px; border-radius: 16px; border: 1px solid; min-height: 112px; }
+    .hb-stat .ic { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; color: #fff; }
+    .hb-stat .ic svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .hb-stat .ic svg.fill { fill: currentColor; stroke: none; }
+    .hb-stat .lbl { font-size: .95rem; font-weight: 600; color: var(--hb-ink); }
+    .hb-stat .num { font-size: 2.3rem; font-weight: 600; color: var(--hb-ink); line-height: 1.1; }
+    .hb-stat .deco { position: absolute; right: 14px; bottom: 8px; width: 78px; height: 62px; opacity: .16; }
+    .hb-stat.s1 { background: #eaf6ee; border-color: #cfe6d8; } .hb-stat.s1 .ic { background: #145a35; } .hb-stat.s1 .deco { fill: #1f7a4a; }
+    .hb-stat.s2 { background: #eaf6ee; border-color: #cfe6d8; } .hb-stat.s2 .ic { background: #1f8a50; } .hb-stat.s2 .deco { fill: #1f8a50; }
+    .hb-stat.s3 { background: #fff3e6; border-color: #f7dcc0; } .hb-stat.s3 .ic { background: #f28c1e; } .hb-stat.s3 .deco { fill: #f28c1e; }
+    .hb-stat.s4 { background: #f1eefc; border-color: #ddd6f5; } .hb-stat.s4 .ic { background: #6c4fd3; } .hb-stat.s4 .deco { fill: #6c4fd3; }
 
-    /* Publish card */
-    .switch-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 0 0; margin-top: 4px; border-top: 1px solid var(--line); }
-    .switch-row .t { font-weight: 600; font-size: .92rem; color: #3d4a48; }
-    .switch-row .d { color: var(--muted); font-size: .8rem; margin-top: 2px; }
-    .switch { position: relative; width: 48px; height: 28px; flex-shrink: 0; }
-    .switch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: pointer; z-index: 2; }
-    .switch .track { position: absolute; inset: 0; background: #d9d1c2; border-radius: 999px; transition: background .2s; }
-    .switch .track::after { content: ""; position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: transform .2s; }
-    .switch input:checked + .track { background: var(--forest); }
-    .switch input:checked + .track::after { transform: translateX(20px); }
-    .switch input:focus-visible + .track { outline: 2px solid var(--gold); outline-offset: 2px; }
+    /* ---------- Panel + toolbar ---------- */
+    .hb-panel { background: #fff; border-radius: 20px; padding: 18px 20px 20px; box-shadow: 0 4px 24px rgba(30,45,36,.06); }
+    .hb-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .hb-search { position: relative; flex: 1 1 260px; min-width: 220px; }
+    .hb-search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; fill: none; stroke: #4a554e; stroke-width: 2; stroke-linecap: round; }
+    .hb-wrap .hb-search input { width: 100%; border: 0; background: transparent; padding: 11px 12px 11px 42px; font-size: .92rem; font-family: inherit; box-shadow: none; outline: none; }
+    .hb-sel { position: relative; flex: 0 0 auto; }
+    .hb-wrap .hb-sel select { appearance: none; -webkit-appearance: none; width: 150px; border: 1px solid var(--hb-line); background: #fff; border-radius: 10px; padding: 10px 34px 10px 14px; font-size: .88rem; color: #3e4a43; cursor: pointer; font-family: inherit; }
+    .hb-wrap .hb-sel.sort select { width: 160px; }
+    .hb-sel svg { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 13px; height: 13px; fill: none; stroke: #4a554e; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+    .hb-sortlbl { font-size: .88rem; color: var(--hb-muted); margin-left: 4px; }
+    .hb-reset { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--hb-line); background: #f7f5f0; display: grid; place-items: center; cursor: pointer; padding: 0; }
+    .hb-reset svg { width: 16px; height: 16px; fill: none; stroke: #4a554e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .hb-reset:hover { background: #efece4; }
 
-    .form-actions { display: flex; gap: 12px; margin-top: 22px; }
-    .form-actions .btn { flex: 1; padding: 13px 18px; }
+    /* ---------- Table ---------- */
+    .hb-table-wrap { overflow-x: auto; }
+    .hb-table { width: 100%; min-width: 1020px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+    .hb-table thead th { background: #f4f1e8; color: #3e4a43; font-size: .9rem; font-weight: 600; text-align: left; padding: 13px 14px; white-space: nowrap; }
+    .hb-table thead th:first-child { border-radius: 10px 0 0 10px; padding-left: 14px; }
+    .hb-table thead th:last-child { border-radius: 0 10px 10px 0; }
+    .hb-table tbody td { padding: 10px 14px; border-bottom: 1px solid var(--hb-line); vertical-align: middle; color: var(--hb-ink); font-size: .92rem; }
+    .hb-table tbody tr:hover { background: #fcfbf8; }
+    .hb-table th.c, .hb-table td.c { text-align: center; }
 
-    @media (max-width: 1000px) {
-        .edit-layout { grid-template-columns: 1fr; }
-        .edit-side { position: static; order: -1; }
+    .hb-thumb { width: 66px; height: 42px; border-radius: 6px; object-fit: cover; display: block; background: #e8efe9; }
+    .hb-thumb.ph { display: grid; place-items: center; background: linear-gradient(135deg, #2c6b47, #14402a); color: #f2b84b; }
+    .hb-thumb.ph svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .hb-name { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: .98rem; color: var(--hb-ink); min-width: 0; }
+    .hb-name svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: #1f7a4a; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .hb-name svg.fill { fill: #1f7a4a; stroke: none; }
+    .hb-name span { overflow-wrap: anywhere; }
+    .hb-desc { color: #5a655e; font-size: .88rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .hb-region { display: flex; align-items: center; gap: 8px; color: #4a554e; }
+    .hb-region svg { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #4a554e; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+    .hb-count { display: inline-block; min-width: 38px; padding: 4px 12px; border-radius: 999px; background: #dfeafb; color: #2756a3; font-weight: 600; font-size: .85rem; text-align: center; }
+    .hb-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; font-size: .84rem; font-weight: 600; white-space: nowrap; }
+    .hb-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .hb-pill.on { background: #e0f2e6; color: #14633f; }
+    .hb-pill.off { background: #f0ece4; color: #6b655c; }
+
+    .hb-actions { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+    .hb-ic { width: 36px; height: 36px; border-radius: 8px; border: 0; display: grid; place-items: center; cursor: pointer; padding: 0; text-decoration: none; transition: filter .15s, transform .15s; }
+    .hb-ic:hover { filter: brightness(.92); transform: translateY(-1px); }
+    .hb-ic svg { width: 17px; height: 17px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .hb-ic.edit { background: #14633f; } .hb-ic.del { background: #ef4a4a; }
+    .hb-more { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--hb-line); background: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; margin-left: 6px; }
+    .hb-more svg { width: 16px; height: 16px; fill: #3e4a43; }
+    .hb-more:hover { background: #f7f5f0; }
+
+    .hb-menu { position: fixed; z-index: 9999; display: none; min-width: 150px; background: #fff; border: 1px solid var(--hb-line); border-radius: 12px; box-shadow: 0 12px 32px rgba(20,30,25,.16); padding: 6px; }
+    .hb-menu.open { display: block; }
+    .hb-menu a, .hb-menu button { width: 100%; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 10px 12px; border-radius: 8px; font-weight: 600; font-size: .9rem; cursor: pointer; font-family: inherit; text-decoration: none; color: #1d2b24; }
+    .hb-menu button { color: #a12626; }
+    .hb-menu a:hover { background: #f1f5ef; } .hb-menu button:hover { background: #fbe9e9; }
+    .hb-menu svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .hb-empty td { text-align: center; padding: 44px 16px !important; color: var(--hb-muted); }
+    .hb-nomatch { display: none; }
+
+    /* ---------- Footer ---------- */
+    .hb-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-top: 18px; color: var(--hb-muted); font-size: .92rem; }
+    .hb-pager { display: flex; gap: 8px; }
+    .hb-pager a, .hb-pager span { width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--hb-line); background: #fff; display: grid; place-items: center; color: #3e4a43; text-decoration: none; font-weight: 600; font-size: .9rem; }
+    .hb-pager svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .hb-pager .on { background: #0d3b22; border-color: #0d3b22; color: #fff; }
+    .hb-pager .off { opacity: .45; }
+
+    @media (max-width: 1100px) {
+        .hb-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .hb-quote { display: none; }
     }
-    @media (max-width: 560px) {
-        .form-grid { grid-template-columns: 1fr; }
+    @media (max-width: 700px) {
+        .hb-hero { flex-direction: column; align-items: flex-start; padding: 22px 20px; }
+        .hb-title { font-size: 2.1rem; }
+        .hb-stats { grid-template-columns: 1fr; }
+        .hb-wrap .hb-sel select, .hb-wrap .hb-sel.sort select { width: 100%; }
+        .hb-sel { flex: 1 1 140px; }
     }
 </style>
 @endpush
 
 @section('content')
 @php
-    if (!function_exists('wk_animal_image_url')) {
-        function wk_animal_image_url($animal) {
-            $raw = null;
-            foreach (['image', 'image_path', 'image_url', 'photo', 'thumbnail', 'featured_image'] as $col) {
-                $v = $animal->getAttribute($col);
-                if (!empty($v) && is_string($v)) { $raw = $v; break; }
-            }
-            if (!$raw) return null;
-            if (preg_match('#^https?://#i', $raw)) return $raw;
+    $isPaginator = method_exists($habitats, 'total');
 
-            $path = ltrim(str_replace('\\', '/', $raw), '/');
-            $candidates = [
-                [public_path($path), $path],
-                [public_path('storage/' . $path), 'storage/' . $path],
-                [storage_path('app/public/' . $path), 'storage/' . $path],
-            ];
-            if (strpos($path, 'public/') === 0) {
-                $t = substr($path, 7);
-                $candidates[] = [storage_path('app/public/' . $t), 'storage/' . $t];
-                $candidates[] = [public_path($t), $t];
-            }
-            if (strpos($path, 'storage/') === 0) {
-                $t = substr($path, 8);
-                $candidates[] = [storage_path('app/public/' . $t), $path];
-            }
-            foreach ($candidates as $c) {
-                if (is_file($c[0])) return asset($c[1]);
-            }
-            return asset(strpos($path, 'storage/') === 0 ? $path : 'storage/' . $path);
-        }
-    }
+    // ---- helpers (column names are guessed so this works with your current model) ----
+    $pick = function ($model, array $cols) {
+        foreach ($cols as $c) { if (!empty($model->{$c})) return $model->{$c}; }
+        return null;
+    };
+    $imageOf = function ($h) use ($pick) {
+        $path = $pick($h, ['image', 'image_path', 'photo', 'thumbnail', 'featured_image', 'main_image', 'cover_image', 'banner_image', 'picture', 'image_url']);
+        if (empty($path)) return null;
+        if (preg_match('#^(https?:)?//#', $path)) return $path;
+        $path = ltrim($path, '/');
+        return file_exists(public_path($path)) ? asset($path) : asset('storage/' . $path);
+    };
+    $regionOf = fn ($h) => $pick($h, ['region', 'location', 'geographical_range', 'country', 'continent']);
+    $typeOf   = fn ($h) => $pick($h, ['type', 'ecosystem', 'category']) ?? $h->name;
+    $countOf  = function ($h) {
+        if (isset($h->animals_count)) return (int) $h->animals_count;
+        if (method_exists($h, 'animals')) { try { return (int) $h->animals()->count(); } catch (\Throwable $e) {} }
+        return 0;
+    };
+    $isActive = fn ($h) => in_array(strtolower((string) $h->status), ['active', 'published', '1'], true);
+
+    // icon key by habitat name
+    $iconKey = function ($name) {
+        $n = strtolower($name);
+        if (preg_match('/desert|dune|arid/', $n)) return 'cactus';
+        if (preg_match('/lake|river|water|ocean|sea|wetland|marsh|reef/', $n)) return 'waves';
+        if (preg_match('/savann|grass|plain|prairie|steppe/', $n)) return 'grass';
+        if (preg_match('/mountain|alpine|hill|cliff/', $n)) return 'mountain';
+        return 'leaf';
+    };
+
+    $icons = [
+        'leaf'     => '<svg class="fill" viewBox="0 0 24 24"><path d="M20.5 3.5C11 3 5 7.5 5 14c0 1.3.3 2.4.8 3.3L3 20.5l1.5 1 2.8-3.2c.9.5 2 .7 3.2.7 6.5 0 10.5-6 10-15.5Z"/></svg>',
+        'grass'    => '<svg viewBox="0 0 24 24"><path d="M5 20c0-5 1-9 3-12M12 20V5M19 20c0-5-1-9-3-12M8.5 20c0-3 .5-5 1.5-7M15.5 20c0-3-.5-5-1.5-7"/></svg>',
+        'cactus'   => '<svg viewBox="0 0 24 24"><path d="M12 21V5a2 2 0 0 1 4 0v6M12 21V9a2 2 0 0 0-4 0M16 15h1a3 3 0 0 0 3-3v-1M8 14H7a3 3 0 0 1-3-3v-1M8 21h8"/></svg>',
+        'waves'    => '<svg viewBox="0 0 24 24"><path d="M3 8c2 0 2-1.500 4.500-1.500S10 8 12 8s2.500-1.500 4.500-1.500S19 8 21 8M3 13c2 0 2-1.500 4.500-1.500S10 13 12 13s2.500-1.500 4.500-1.500S19 13 21 13M3 18c2 0 2-1.500 4.500-1.500S10 18 12 18s2.500-1.500 4.500-1.500S19 18 21 18"/></svg>',
+        'mountain' => '<svg viewBox="0 0 24 24"><path d="m2.500 19 6-10 4 6 2.500-3.500 6.500 7.500Z"/></svg>',
+    ];
+
+    $list = collect($habitats);
+    $totalHabitats = $isPaginator ? $habitats->total() : $list->count();
+    $activeCount   = $list->filter(fn ($h) => $isActive($h))->count();
+    $regionNames   = $list->map(fn ($h) => $regionOf($h))->filter()->unique()->values();
+    $ecoCount      = $list->map(fn ($h) => strtolower($typeOf($h)))->unique()->count();
+
+    $heroImg = file_exists(public_path('images/habitats-banner.jpg')) ? asset('images/habitats-banner.jpg') : null;
 @endphp
-@php $imageUrl = wk_animal_image_url($animal); @endphp
 
-<div class="edit-head">
-    <div>
-        <h2>{{ $animal->name }}</h2>
-        <p>Changes are saved to your website as soon as you click "Update animal".</p>
-    </div>
-    <a href="{{ route('admin.animals.index') }}" class="back-link">
-        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-        Back to animals
-    </a>
-    @if($animal->exists)
-        <a href="{{ route('admin.animals.preview', $animal) }}" class="btn btn-outline" target="_blank" rel="noopener">Preview animal</a>
-    @endif
-</div>
+<div class="hb-wrap">
 
-<form method="POST" action="{{ route('admin.animals.update', $animal) }}" enctype="multipart/form-data">
-    @csrf
-    @method('PUT')
+    {{-- ===== Hero ===== --}}
+    <div class="hb-hero">
+        @if($heroImg)
+            <img class="hb-hero-img" src="{{ $heroImg }}" alt="">
+        @else
+            <svg class="hb-hero-art" viewBox="0 0 1200 220" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+                <defs>
+                    <linearGradient id="hbSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3eed6"/><stop offset="1" stop-color="#bfd8ad"/></linearGradient>
+                    <linearGradient id="hbRiver" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9ecf2"/><stop offset="1" stop-color="#a9d3e0"/></linearGradient>
+                </defs>
+                <rect width="1200" height="220" fill="url(#hbSky)"/>
+                <path d="M300 150 L470 70 L560 110 L700 40 L860 120 L980 70 L1200 130 V220 H300Z" fill="#9fc08a" opacity=".75"/>
+                <path d="M420 170 L600 95 L720 140 L880 80 L1060 150 L1200 110 V220 H420Z" fill="#6f9d62" opacity=".85"/>
+                <path d="M520 190 L700 130 L860 170 L1000 120 L1200 170 V220 H520Z" fill="#3f7a4a"/>
+                <path d="M640 220 C700 190 760 205 820 185 C880 165 960 190 1040 170 C1100 156 1150 165 1200 160 V172 C1140 176 1090 170 1040 184 C960 204 880 180 826 198 C770 216 712 204 676 220Z" fill="url(#hbRiver)"/>
+            </svg>
+        @endif
 
-    <div class="edit-layout">
-        <div class="edit-main">
-            <div class="panel">
-                <h3 class="section-title">Basic details</h3>
-                <p class="section-sub">The name and description visitors see on the website.</p>
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="name">Name <span class="req">*</span></label>
-                        <input id="name" name="name" type="text" value="{{ old('name', $animal->name) }}" class="@error('name') is-invalid @enderror" required>
-                        @error('name')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="field">
-                        <label for="scientific_name">Scientific name</label>
-                        <input id="scientific_name" name="scientific_name" type="text" value="{{ old('scientific_name', $animal->scientific_name) }}" class="@error('scientific_name') is-invalid @enderror">
-                        @error('scientific_name')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="field">
-                        <label for="slug">URL slug</label>
-                        <input id="slug" name="slug" type="text" value="{{ old('slug', $animal->slug) }}" class="@error('slug') is-invalid @enderror">
-                        @error('slug')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="field">
-                        <label for="short_description">Short description</label>
-                        <input id="short_description" name="short_description" type="text" maxlength="500" value="{{ old('short_description', $animal->short_description) }}">
-                    </div>
-                    <div class="field full">
-                        <label for="description">Description <span class="req">*</span></label>
-                        <textarea id="description" name="description" class="@error('description') is-invalid @enderror" required>{{ old('description', $animal->description) }}</textarea>
-                        @error('description')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                </div>
+        <div>
+            <div class="hb-crumb">
+                <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin') }}">Dashboard</a><span class="sep">/</span><span class="current">Habitats</span>
             </div>
-
-            <div class="panel">
-                <h3 class="section-title">Classification</h3>
-                <p class="section-sub">Helps visitors filter and find this animal.</p>
-                <div class="form-grid">
-                    <div class="field">
-                        <label for="category">Category <span class="req">*</span></label>
-                        <select id="category" name="category" class="@error('category') is-invalid @enderror" required>
-                            @foreach(['Mammals','Birds','Reptiles','Amphibians','Big Cats','Primates','Herbivores','Other'] as $category)
-                                <option value="{{ $category }}" {{ old('category', $animal->category) == $category ? 'selected' : '' }}>{{ $category }}</option>
-                            @endforeach
-                        </select>
-                        @error('category')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="field">
-                        <label for="habitat_id">Habitat</label>
-                        <select id="habitat_id" name="habitat_id" class="@error('habitat_id') is-invalid @enderror">
-                            <option value="">Select habitat</option>
-                            @foreach($habitats as $habitat)
-                                <option value="{{ $habitat->id }}" {{ old('habitat_id', $animal->habitat_id) == $habitat->id ? 'selected' : '' }}>{{ $habitat->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('habitat_id')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                    <div class="field full">
-                        <label for="conservation_status">Conservation status <span class="req">*</span></label>
-                        <input id="conservation_status" name="conservation_status" type="text" value="{{ old('conservation_status', $animal->conservation_status) }}" class="@error('conservation_status') is-invalid @enderror" required>
-                        <div class="hint">For example: Vulnerable, Endangered, Least Concern.</div>
-                        @error('conservation_status')<div class="field-error">{{ $message }}</div>@enderror
-                    </div>
-                </div>
-            </div>
-            @include('admin.animals._extended-fields')
+            <h1 class="hb-title">
+                <svg viewBox="0 0 24 24"><path d="M20.5 3.5C11 3 5 7.5 5 14c0 1.3.3 2.4.8 3.3L3 20.5l1.5 1 2.8-3.2c.9.5 2 .7 3.2.7 6.5 0 10.5-6 10-15.5Z"/></svg>
+                Habitats
+                <svg viewBox="0 0 24 24"><path d="M20.5 3.5C11 3 5 7.5 5 14c0 1.3.3 2.4.8 3.3L3 20.5l1.5 1 2.8-3.2c.9.5 2 .7 3.2.7 6.5 0 10.5-6 10-15.5Z"/></svg>
+            </h1>
+            <p class="hb-sub">Manage and organize animal habitats in your wildlife database.</p>
         </div>
 
-        <div class="edit-side">
-            <div class="panel">
-                <h3 class="section-title">Animal photo</h3>
-                <p class="section-sub">This image appears on the website.</p>
+        <div class="hb-hero-right">
+            <div class="hb-quote">&ldquo;Healthy habitats support healthy wildlife.&rdquo;</div>
+            <a href="{{ route('admin.habitats.create') }}" class="hb-add">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                Add Habitat
+            </a>
+        </div>
+    </div>
 
-                <label for="image" class="img-frame {{ $imageUrl ? 'has-image' : '' }}" id="imgFrame" style="margin:0;">
-                    <span class="img-tag" id="imgTag" style="{{ $imageUrl ? '' : 'display:none;' }}">Current photo</span>
-                    @if($imageUrl)
-                        <img src="{{ $imageUrl }}" alt="{{ $animal->name }}" id="imgPreview" onerror="this.style.display='none'; document.getElementById('imgPlaceholder').style.display='block'; document.getElementById('imgFrame').classList.remove('has-image');">
+    {{-- ===== Stat cards ===== --}}
+    <div class="hb-stats">
+        <div class="hb-stat s1">
+            <div class="ic"><svg class="fill" viewBox="0 0 24 24"><ellipse cx="6.5" cy="10" rx="2" ry="2.6"/><ellipse cx="10.5" cy="6" rx="2" ry="2.6"/><ellipse cx="15.5" cy="6" rx="2" ry="2.6"/><ellipse cx="19" cy="10.5" rx="2" ry="2.6"/><path d="M12.800 11.500c-2.600 0-5.300 3-5.300 5.300 0 1.800 1.500 2.700 3.100 2.700.9 0 1.400-.3 2.200-.3s1.300.3 2.200.3c1.600 0 3.100-.9 3.100-2.700 0-2.300-2.700-5.300-5.300-5.300Z"/></svg></div>
+            <div><div class="lbl">Total Habitats</div><div class="num">{{ $totalHabitats }}</div></div>
+            <svg class="deco" viewBox="0 0 24 20"><path d="m0 20 8-14 5 8 3-4 8 10Z"/></svg>
+        </div>
+        <div class="hb-stat s2">
+            <div class="ic"><svg viewBox="0 0 24 24"><path d="M20.500 3.500C11 3 5 7.500 5 14c0 1.300.3 2.400.8 3.300L3 20.500M9 15c3-5 6-7 10-8"/></svg></div>
+            <div><div class="lbl">Active Habitats</div><div class="num">{{ $activeCount }}</div></div>
+            <svg class="deco" viewBox="0 0 24 24"><path d="M20.5 3.5C11 3 5 7.5 5 14c0 1.3.3 2.4.8 3.3L3 20.5l1.5 1 2.8-3.2c.9.5 2 .7 3.2.7 6.5 0 10.5-6 10-15.5Z"/></svg>
+        </div>
+        <div class="hb-stat s3">
+            <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21Z"/><circle cx="12" cy="9.500" r="2.500"/></svg></div>
+            <div><div class="lbl">Regions Covered</div><div class="num">{{ $regionNames->count() }}</div></div>
+            <svg class="deco" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/></svg>
+        </div>
+        <div class="hb-stat s4">
+            <div class="ic"><svg class="fill" viewBox="0 0 24 24"><path d="m2 19 7-12 4 6 2.500-3.500L22 19Z"/></svg></div>
+            <div><div class="lbl">Unique Ecosystems</div><div class="num">{{ $ecoCount }}</div></div>
+            <svg class="deco" viewBox="0 0 24 20"><path d="m0 20 8-14 5 8 3-4 8 10Z"/></svg>
+        </div>
+    </div>
+
+    {{-- ===== Table panel ===== --}}
+    <div class="hb-panel">
+        <div class="hb-toolbar">
+            <div class="hb-search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.300-4.300"/></svg>
+                <input type="text" id="hbSearch" placeholder="Search habitats..." autocomplete="off">
+            </div>
+
+            <div class="hb-sel">
+                <select id="hbStatus">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+
+            <div class="hb-sel">
+                <select id="hbRegion">
+                    <option value="">All Regions</option>
+                    @foreach($regionNames as $rn)
+                        <option value="{{ strtolower($rn) }}">{{ \Illuminate\Support\Str::limit($rn, 28) }}</option>
+                    @endforeach
+                </select>
+                <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+
+            <span class="hb-sortlbl">Sort by</span>
+            <div class="hb-sel sort">
+                <select id="hbSort">
+                    <option value="az">Name (A-Z)</option>
+                    <option value="za">Name (Z-A)</option>
+                    <option value="animals">Most Animals</option>
+                    <option value="newest">Newest First</option>
+                </select>
+                <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+
+            <button type="button" class="hb-reset" id="hbReset" title="Reset filters" aria-label="Reset filters">
+                <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.700"/><path d="M3 4v5h5"/></svg>
+            </button>
+        </div>
+
+        <div class="hb-table-wrap">
+            <table class="hb-table">
+                <colgroup>
+                    <col style="width:64px"><col style="width:96px"><col style="width:21%"><col><col style="width:16%"><col style="width:130px"><col style="width:120px"><col style="width:190px">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Region</th>
+                        <th class="c">Animals Count</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="hbRows">
+                    @forelse($habitats as $habitat)
+                        @php
+                            $img    = $imageOf($habitat);
+                            $region = $regionOf($habitat);
+                            $count  = $countOf($habitat);
+                            $active = $isActive($habitat);
+                            $ikey   = $iconKey($habitat->name);
+                        @endphp
+                        <tr class="hb-row"
+                            data-id="{{ $habitat->getKey() }}"
+                            data-name="{{ strtolower($habitat->name) }}"
+                            data-search="{{ strtolower($habitat->name . ' ' . $habitat->short_description . ' ' . $region) }}"
+                            data-status="{{ $active ? 'active' : 'inactive' }}"
+                            data-region="{{ strtolower($region ?? '') }}"
+                            data-animals="{{ $count }}">
+                            <td>{{ $habitat->getKey() }}</td>
+                            <td>
+                                @if($img)
+                                    <img class="hb-thumb" src="{{ $img }}" alt="{{ $habitat->name }}" data-icon="{{ $ikey }}">
+                                @else
+                                    <div class="hb-thumb ph">{!! $icons[$ikey] !!}</div>
+                                @endif
+                            </td>
+                            <td><div class="hb-name">{!! $icons[$ikey] !!}<span>{{ $habitat->name }}</span></div></td>
+                            <td><div class="hb-desc" title="{{ $habitat->short_description }}">{{ $habitat->short_description ?: '-' }}</div></td>
+                            <td>
+                                @if($region)
+                                    <div class="hb-region">
+                                        <svg viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21Z"/><circle cx="12" cy="9.500" r="2.500"/></svg>
+                                        <span>{{ $region }}</span>
+                                    </div>
+                                @else
+                                    <span style="color:#b3ada3">-</span>
+                                @endif
+                            </td>
+                            <td class="c"><span class="hb-count">{{ $count }}</span></td>
+                            <td><span class="hb-pill {{ $active ? 'on' : 'off' }}">{{ ucfirst($habitat->status) }}</span></td>
+                            <td>
+                                <div class="hb-actions">
+                                    <a href="{{ route('admin.habitats.edit', $habitat) }}" class="hb-ic edit" title="Edit" aria-label="Edit">
+                                        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.500 3.500a2.100 2.100 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                    </a>
+                                    <form id="del-{{ $habitat->getKey() }}" action="{{ route('admin.habitats.destroy', $habitat) }}" method="POST" style="display:none">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                    <button type="submit" form="del-{{ $habitat->getKey() }}" class="hb-ic del" title="Delete" aria-label="Delete" onclick="return confirm('Delete this habitat?')">
+                                        <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m6 6 1 14h10l1-14"/></svg>
+                                    </button>
+                                    <button type="button" class="hb-more" data-menu="hmenu-{{ $habitat->getKey() }}" aria-label="More actions">
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="12" cy="19" r="1.800"/></svg>
+                                    </button>
+                                    <div class="hb-menu" id="hmenu-{{ $habitat->getKey() }}">
+                                        <a href="{{ route('admin.habitats.edit', $habitat) }}">
+                                            <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.500 3.500a2.100 2.100 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit
+                                        </a>
+                                        <button type="submit" form="del-{{ $habitat->getKey() }}" onclick="return confirm('Delete this habitat?')">
+                                            <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m6 6 1 14h10l1-14"/></svg>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr class="hb-empty"><td colspan="8">No habitats found. Click "Add Habitat" to create the first one.</td></tr>
+                    @endforelse
+                    <tr class="hb-empty hb-nomatch" id="hbNoMatch"><td colspan="8">No habitats match your filters.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="hb-foot">
+            <div>
+                @if($isPaginator && $habitats->total() > 0)
+                    Showing {{ $habitats->firstItem() }}&ndash;{{ $habitats->lastItem() }} of {{ $habitats->total() }} {{ \Illuminate\Support\Str::plural('habitat', $habitats->total()) }}
+                @else
+                    Showing {{ $list->count() ? '1–' . $list->count() : '0' }} of {{ $list->count() }} {{ \Illuminate\Support\Str::plural('habitat', $list->count()) }}
+                @endif
+            </div>
+            <div class="hb-pager">
+                @if($isPaginator)
+                    @if($habitats->onFirstPage())
+                        <span class="off"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span>
                     @else
-                        <img src="" alt="" id="imgPreview" style="display:none;">
+                        <a href="{{ $habitats->previousPageUrl() }}"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></a>
                     @endif
-                    <div class="img-placeholder" id="imgPlaceholder" style="{{ $imageUrl ? 'display:none;' : '' }}">
-                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
-                        <div>No photo yet.<br>Click or drop an image here.</div>
-                    </div>
-                </label>
-
-                <input id="image" name="image" type="file" accept="image/*" class="file-input-hidden">
-
-                <div class="img-actions">
-                    <label for="image" class="btn btn-outline btn-sm" style="padding:9px 18px;">{{ $imageUrl ? 'Replace photo' : 'Choose photo' }}</label>
-                    <button type="button" class="btn btn-sm" id="resetImage" style="display:none; padding:9px 18px; background:#f0ece4; color:#4f5654;">Undo change</button>
-                </div>
-                <div class="img-meta" id="imgMeta"></div>
-                <div class="img-check" id="imgCheck"></div>
-                @error('image')<div class="field-error">{{ $message }}</div>@enderror
-                <div class="field">
-                    <label for="image_alt_text">Main image alt text</label>
-                    <input id="image_alt_text" name="image_alt_text" value="{{ old('image_alt_text', $animal->image_alt_text) }}">
-                </div>
-                <div class="field">
-                    <label for="image_caption">Main image caption</label>
-                    <input id="image_caption" name="image_caption" value="{{ old('image_caption', $animal->image_caption) }}">
-                </div>
-                <div class="field">
-                    <label for="image_credit">Main image credit</label>
-                    <input id="image_credit" name="image_credit" value="{{ old('image_credit', $animal->image_credit) }}">
-                </div>
-                <div class="field">
-                    <label for="image_source">Main image source</label>
-                    <input id="image_source" name="image_source" value="{{ old('image_source', $animal->image_source) }}">
-                </div>
-
-                <div class="size-guide">
-                    <strong>Best image size</strong>
-                    <ul>
-                        <li>1200 × 800 px (3:2, landscape)</li>
-                        <li>JPG, PNG or WebP, under 2 MB</li>
-                        <li>Keep the animal in the centre, as the edges can be cropped</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="panel">
-                <h3 class="section-title">Visibility</h3>
-                <p class="section-sub">Control where this animal shows up.</p>
-                <div class="field">
-                    <label for="status">Status</label>
-                    <select id="status" name="status">
-                        <option value="published" {{ old('status', $animal->status) == 'published' ? 'selected' : '' }}>Published (visible on website)</option>
-                        <option value="draft" {{ old('status', $animal->status) == 'draft' ? 'selected' : '' }}>Draft (hidden)</option>
-                    </select>
-                </div>
-                <div class="switch-row">
-                    <div>
-                        <div class="t">Featured animal</div>
-                        <div class="d">Highlight on the home page</div>
-                    </div>
-                    <div class="switch">
-                        <input type="hidden" name="is_featured" value="0">
-                        <input name="is_featured" type="checkbox" value="1" {{ old('is_featured', $animal->is_featured) ? 'checked' : '' }} aria-label="Featured animal">
-                        <span class="track"></span>
-                    </div>
-                </div>
-                <div class="field" style="margin-top:16px;">
-                    <label for="display_order">Display order</label>
-                    <input id="display_order" name="display_order" type="number" min="0" value="{{ old('display_order', $animal->display_order) }}">
-                </div>
-                <div class="field">
-                    <label><input type="hidden" name="is_homepage_visible" value="0"><input name="is_homepage_visible" type="checkbox" value="1" {{ old('is_homepage_visible', $animal->is_homepage_visible) ? 'checked' : '' }}> Show on homepage</label>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Update animal</button>
-                    <a href="{{ route('admin.animals.index') }}" class="btn btn-outline">Cancel</a>
-                </div>
+                    @foreach($habitats->getUrlRange(max(1, $habitats->currentPage() - 2), min($habitats->lastPage(), $habitats->currentPage() + 2)) as $page => $url)
+                        @if($page == $habitats->currentPage())
+                            <span class="on">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}">{{ $page }}</a>
+                        @endif
+                    @endforeach
+                    @if($habitats->hasMorePages())
+                        <a href="{{ $habitats->nextPageUrl() }}"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></a>
+                    @else
+                        <span class="off"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
+                    @endif
+                @else
+                    <span class="off"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span>
+                    <span class="on">1</span>
+                    <span class="off"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>
+                @endif
             </div>
         </div>
     </div>
-</form>
+</div>
 
 <script>
     (function () {
-        var input = document.getElementById('image');
-        var frame = document.getElementById('imgFrame');
-        var preview = document.getElementById('imgPreview');
-        var placeholder = document.getElementById('imgPlaceholder');
-        var tag = document.getElementById('imgTag');
-        var meta = document.getElementById('imgMeta');
-        var check = document.getElementById('imgCheck');
-        var resetBtn = document.getElementById('resetImage');
+        var body = document.getElementById('hbRows');
+        var rows = Array.prototype.slice.call(document.querySelectorAll('.hb-row'));
+        var noMatch = document.getElementById('hbNoMatch');
+        var q = document.getElementById('hbSearch');
+        var st = document.getElementById('hbStatus');
+        var rg = document.getElementById('hbRegion');
+        var so = document.getElementById('hbSort');
 
-        var original = {
-            src: preview.getAttribute('src') || '',
-            hasImage: frame.classList.contains('has-image')
-        };
+        function run() {
+            var text = q.value.trim().toLowerCase(), s = st.value, r = rg.value, shown = 0;
 
-        function showCheck(type, text) {
-            check.className = 'img-check ' + type;
-            check.textContent = text;
-        }
-
-        function restore() {
-            input.value = '';
-            meta.textContent = '';
-            check.className = 'img-check';
-            check.textContent = '';
-            resetBtn.style.display = 'none';
-            if (original.hasImage) {
-                preview.src = original.src;
-                preview.style.display = 'block';
-                placeholder.style.display = 'none';
-                frame.classList.add('has-image');
-                tag.textContent = 'Current photo';
-                tag.className = 'img-tag';
-                tag.style.display = '';
-            } else {
-                preview.removeAttribute('src');
-                preview.style.display = 'none';
-                placeholder.style.display = 'block';
-                frame.classList.remove('has-image');
-                tag.style.display = 'none';
-            }
-        }
-
-        function handleFile(file) {
-            if (!file) { restore(); return; }
-            if (!file.type || file.type.indexOf('image/') !== 0) {
-                restore();
-                showCheck('warn', 'Please choose an image file (JPG, PNG or WebP).');
-                return;
-            }
-            var url = URL.createObjectURL(file);
-            preview.src = url;
-            preview.style.display = 'block';
-            placeholder.style.display = 'none';
-            frame.classList.add('has-image');
-            tag.textContent = 'New photo (not saved yet)';
-            tag.className = 'img-tag new';
-            tag.style.display = '';
-            resetBtn.style.display = 'inline-flex';
-
-            var mb = file.size / (1024 * 1024);
-            meta.textContent = file.name + ' · ' + mb.toFixed(2) + ' MB';
-
-            var probe = new Image();
-            probe.onload = function () {
-                var w = probe.naturalWidth, h = probe.naturalHeight;
-                var ratio = w / h;
-                meta.textContent = file.name + ' · ' + w + ' × ' + h + ' px · ' + mb.toFixed(2) + ' MB';
-                var problems = [];
-                if (w < 800) problems.push('The image is small and may look blurry. Use at least 1200 px wide.');
-                if (mb > 2) problems.push('The file is over 2 MB and may load slowly or be rejected.');
-                if (ratio < 1.2 || ratio > 1.8) problems.push('This shape will be cropped. A 3:2 landscape photo fits best.');
-                if (problems.length) {
-                    showCheck('warn', problems.join(' '));
-                } else {
-                    showCheck('ok', 'Looks good. Click "Update animal" to save it.');
+            rows.sort(function (a, b) {
+                var A = a.dataset, B = b.dataset;
+                switch (so.value) {
+                    case 'za': return B.name.localeCompare(A.name);
+                    case 'animals': return (+B.animals) - (+A.animals);
+                    case 'newest': return (+B.id) - (+A.id);
+                    default: return A.name.localeCompare(B.name);
                 }
-            };
-            probe.src = url;
+            }).forEach(function (row) { body.insertBefore(row, noMatch); });
+
+            rows.forEach(function (row) {
+                var ok = (!text || row.dataset.search.indexOf(text) !== -1) &&
+                         (!s || row.dataset.status === s) &&
+                         (!r || row.dataset.region === r);
+                row.style.display = ok ? '' : 'none';
+                if (ok) shown++;
+            });
+            if (noMatch) noMatch.style.display = (rows.length && shown === 0) ? 'table-row' : 'none';
         }
 
-        input.addEventListener('change', function () { handleFile(input.files[0]); });
-        resetBtn.addEventListener('click', restore);
+        if (rows.length) {
+            q.addEventListener('input', run);
+            [st, rg, so].forEach(function (el) { el.addEventListener('change', run); });
+            document.getElementById('hbReset').addEventListener('click', function () {
+                q.value = ''; st.value = ''; rg.value = ''; so.value = 'az'; run();
+            });
+            run();
+        }
 
-        ['dragenter', 'dragover'].forEach(function (evt) {
-            frame.addEventListener(evt, function (e) { e.preventDefault(); frame.classList.add('drag'); });
-        });
-        ['dragleave', 'drop'].forEach(function (evt) {
-            frame.addEventListener(evt, function (e) { e.preventDefault(); frame.classList.remove('drag'); });
-        });
-        frame.addEventListener('drop', function (e) {
-            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
-                input.files = e.dataTransfer.files;
-                handleFile(input.files[0]);
+        // broken image -> icon tile
+        document.querySelectorAll('img.hb-thumb[data-icon]').forEach(function (img) {
+            function swap() {
+                var d = document.createElement('div');
+                d.className = 'hb-thumb ph';
+                var ic = img.closest('tr').querySelector('.hb-name svg');
+                d.innerHTML = ic ? ic.outerHTML : '';
+                img.replaceWith(d);
             }
+            if (img.complete && img.naturalWidth === 0) swap(); else img.addEventListener('error', swap);
+        });
+
+        // three-dot menu
+        var open = null;
+        function closeMenu() { if (open) { open.classList.remove('open'); open = null; } }
+        document.querySelectorAll('.hb-more').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var menu = document.getElementById(btn.dataset.menu);
+                if (open === menu) { closeMenu(); return; }
+                closeMenu();
+                var r = btn.getBoundingClientRect();
+                menu.classList.add('open');
+                var h = menu.offsetHeight, w = menu.offsetWidth, top = r.bottom + 6;
+                if (top + h > window.innerHeight) top = r.top - h - 6;
+                menu.style.top = top + 'px';
+                menu.style.left = Math.max(8, r.right - w) + 'px';
+                open = menu;
+            });
+        });
+        document.addEventListener('click', closeMenu);
+        window.addEventListener('scroll', closeMenu, true);
+        window.addEventListener('resize', closeMenu);
+    })();
+</script>
+
+<script>
+    // Layout ka apna "Habitats" heading hide karta hai (layout file ko touch kiye bina)
+    (function () {
+        document.querySelectorAll('h1, h2, h3, .page-title, .page-heading').forEach(function (el) {
+            if (el.closest('.hb-wrap') || el.closest('aside') || el.closest('nav') || el.closest('header')) return;
+            var t = el.textContent.trim();
+            if (t === 'Habitats' || t === 'Habitat management') el.style.display = 'none';
         });
     })();
 </script>

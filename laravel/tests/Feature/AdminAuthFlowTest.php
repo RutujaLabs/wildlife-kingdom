@@ -41,6 +41,26 @@ class AdminAuthFlowTest extends TestCase
             ->assertSee('Total habitats');
     }
 
+    public function test_invalid_credentials_return_to_login_with_an_error(): void
+    {
+        User::factory()->create([
+            'email' => 'admin@example.test',
+            'password' => Hash::make('secret-password'),
+        ]);
+
+        $this->from(route('admin.login'))
+            ->post(route('admin.authenticate'), [
+                'email' => 'admin@example.test',
+                'password' => 'incorrect-password',
+            ])
+            ->assertRedirect(route('admin.login'))
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest('web');
+        $this->get(route('admin.dashboard'))
+            ->assertRedirect(route('admin.login'));
+    }
+
     public function test_admin_seeder_uses_explicit_credentials(): void
     {
         config([
