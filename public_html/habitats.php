@@ -24,6 +24,17 @@ function hb_img($file) {
   return is_file(__DIR__ . '/../uploads/habitats/' . $file) ? '../uploads/habitats/' . rawurlencode($file) : '';
 }
 function hb_e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
+
+/* ---- Banner image (automatic) ----
+   Bas image is folder me rakh do:  <project>/assets/images/static/
+   Naam yahi hona chahiye:  habitats-banner.webp  (ya .jpg / .jpeg / .png)
+   File milte hi banner me dikhne lagti hai, code badalne ki zaroorat nahi.
+   Nayi image se replace karoge to browser cache apne aap refresh ho jaata hai. */
+$bannerSrc = '';
+foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg', 'habitats-banner.png'] as $bf) {
+  $bp = __DIR__ . '/../assets/images/static/' . $bf;
+  if (is_file($bp)) { $bannerSrc = '../assets/images/static/' . $bf . '?v=' . filemtime($bp); break; }
+}
 ?>
 
 <style>
@@ -117,8 +128,9 @@ function hb_e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 
   <!-- ============ BANNER ============ -->
   <section class="hb-banner">
-    <!-- BANNER IMAGE: jab image ready ho, neeche wali line uncomment karke file ka naam badal do (1920 x 500 px) -->
-    <!-- <img class="hb-banner-photo" src="../assets/images/static/YOUR-BANNER-IMAGE.webp" alt="Wildlife Kingdom habitats"> -->
+    <?php if ($bannerSrc): ?>
+      <img class="hb-banner-photo" src="<?php echo hb_e($bannerSrc); ?>" alt="Wildlife Kingdom habitats" fetchpriority="high">
+    <?php endif; ?>
     <h1 class="hb-sr">Our Habitats</h1>
   </section>
 

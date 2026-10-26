@@ -32,7 +32,7 @@ if ($result) { while ($row = $result->fetch_assoc()) { $events[] = $row; } }
   --sw-orange: #E8A15B;   /* Safari Orange   */
   --sw-forest: #173B2A;   /* Headings/buttons */
   --sw-dark:   #0B2F22;   /* Footer          */
-  --sw-gold:   #C89B3C;   /* Accents/icons   */
+  --sw-gold:   #E8A15B;   /* Accents/icons   */
   --sw-text:   #2B241D;   /* Body text       */
 
   /* Re-point common existing variables (used by inline styles in your pages) */
@@ -122,7 +122,7 @@ section.section h1, section.section h2, section.section h3,
 /* ---------- Cards (white, gold-edged, soft shadow) ---------- */
 .explore-card, .animal-card, .event-row, .habitat-card {
   background: var(--sw-white);
-  border: 1px solid rgba(200, 155, 60, .45);
+  border: 1px solid rgba(232,161,91, .45);
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(23, 59, 42, .12);
   transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
@@ -143,7 +143,7 @@ section.section h1, section.section h2, section.section h3,
 .explore-icon { color: var(--sw-gold); }
 .animal-card .status {
   color: var(--sw-forest);
-  background: rgba(200, 155, 60, .22);
+  background: rgba(232,161,91, .22);
   border: 1px solid var(--sw-gold);
   border-radius: 999px;
   padding: 2px 10px;
@@ -219,7 +219,7 @@ footer a:hover, .site-footer a:hover, .footer a:hover { color: var(--sw-gold); }
 .wk-hero h1 .wk-h1-accent { color: #E8A15B; font-style: italic; }
 .wk-hero h1::after {             /* rule that runs the full width of the heading */
   content: ""; display: block; width: 100%; height: 2px; margin-top: 14px;
-  background: linear-gradient(90deg, var(--sw-gold), rgba(200,155,60,0));
+  background: linear-gradient(90deg, var(--sw-gold), rgba(232,161,91,0));
 }
 .wk-hero h1 em {
   font-style: normal; white-space: nowrap;
@@ -250,7 +250,7 @@ footer a:hover, .site-footer a:hover, .footer a:hover { color: var(--sw-gold); }
 }
 .wk-frame::after {                 /* thin gold "mat" line inside the picture */
   content: ""; position: absolute; inset: 10px; z-index: 2; pointer-events: none;
-  border: 1.5px solid rgba(200, 155, 60, .85);
+  border: 1.5px solid rgba(232,161,91, .85);
   border-radius: 100px 10px 100px 10px;
 }
 .wk-frame img {
@@ -351,7 +351,7 @@ section.section.wk-explore.wk-explore {
   position: relative; overflow: hidden;
   min-height: 150px; padding: 16px 18px; text-decoration: none;
   background: linear-gradient(160deg, rgba(255,253,248,.10), rgba(255,253,248,.03));
-  border: 1px solid rgba(200,155,60,.6);
+  border: 1px solid rgba(232,161,91,.6);
   border-radius: 70px 14px 70px 14px;
   transition: transform .3s ease, background .3s ease, border-color .3s ease;
 }
@@ -474,7 +474,7 @@ section.section.wk-habitats.wk-habitats {
 .wk-habitats .wk-hb-tags span {
   padding: 6px 14px; border-radius: 999px; font-size: .78rem; font-weight: 700;
   letter-spacing: .04em; color: #173B2A;
-  background: rgba(255,253,248,.92); border: 1px solid #C89B3C;
+  background: rgba(255,253,248,.92); border: 1px solid #E8A15B;
   box-shadow: 0 6px 14px rgba(11,47,34,.22);
 }
 
@@ -490,7 +490,7 @@ section.section.wk-habitats.wk-habitats {
 .wk-habitats h2 .wk-hb-accent { color: #E8A15B !important; font-style: italic; }
 .wk-habitats h2::after {
   content: ""; display: block; width: 100%; height: 2px; margin-top: 14px;
-  background: linear-gradient(90deg, #C89B3C, rgba(200,155,60,0));
+  background: linear-gradient(90deg, #E8A15B, rgba(232,161,91,0));
 }
 .wk-habitats .wk-hb-copy p {
   margin: 0 0 10px; font-size: .95rem; line-height: 1.7;
@@ -518,7 +518,7 @@ section.section.wk-habitats.wk-habitats {
 
 /* =====================================================
    SECTION 4 — Wildlife Experiences ("wk-xp")
-   bg #173B2A (same green as section 2), compact, small side spacing.
+   bg Soft White #FFFDF8 (sits after the green "wk-ds" section), compact, small side spacing.
    It is a <div> (not <section>) so the white/orange alternation of the
    sections below stays exactly as it was.
    Layout: text on the left, arch photo + round photo + badge on the right
@@ -559,7 +559,7 @@ section.section.wk-habitats.wk-habitats {
   color: rgba(255,253,248,.88); text-align: justify; hyphens: manual;
 }
 .wk-xp .wk-xp-copy p.wk-xp-note {          /* 2nd & 3rd paragraphs get a gold rule */
-  padding-left: 14px; border-left: 3px solid #C89B3C;
+  padding-left: 14px; border-left: 3px solid #E8A15B;
 }
 .wk-xp .wk-xp-btn {
   display: inline-block; padding: 11px 26px; font-size: .9rem; font-weight: 700;
@@ -595,7 +595,7 @@ section.section.wk-habitats.wk-habitats {
 .wk-xp-visual::before {            /* offset gold frame (up-right) */
   content: ""; position: absolute; z-index: 0;
   top: -14px; left: 46px; right: 10px; bottom: 48px;
-  border: 1.5px solid #C89B3C; border-radius: 150px 10px 150px 10px;
+  border: 1.5px solid #E8A15B; border-radius: 150px 10px 150px 10px;
   translate: calc(var(--px, 0) * -10px) calc(var(--py, 0) * -10px);
   transition: top .5s, right .5s, left .5s, bottom .5s;
 }
@@ -639,7 +639,7 @@ section.section.wk-habitats.wk-habitats {
   border-radius: 10px 58px 10px 58px;
   background: linear-gradient(160deg, #2E5B44 0%, #0B2F22 100%);
   border: 5px solid #173B2A;
-  box-shadow: 0 0 0 2px #C89B3C, 0 16px 28px rgba(0,0,0,.45);
+  box-shadow: 0 0 0 2px #E8A15B, 0 16px 28px rgba(0,0,0,.45);
   animation: wkXpBob 6s ease-in-out infinite;
 }
 .wk-xp-sub img { transition: transform .8s cubic-bezier(.2,.7,.2,1); }
@@ -745,7 +745,7 @@ section.section.wk-habitats.wk-habitats {
 
 /* ---- header ---- */
 .wk-cv-head { margin-bottom: 14px; text-align: center; }
-.wk-cv .wk-eyebrow::after { content: ""; width: 36px; height: 2px; background: #C89B3C; }   /* mirrors the left line */
+.wk-cv .wk-eyebrow::after { content: ""; width: 36px; height: 2px; background: #E8A15B; }   /* mirrors the left line */
 .wk-cv h2 {
   margin: 0 0 14px; width: 100%;
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -755,7 +755,7 @@ section.section.wk-habitats.wk-habitats {
 .wk-cv h2 .wk-cv-accent { color: #E8A15B; font-style: italic; }
 .wk-cv h2::after {
   content: ""; display: block; width: 100%; height: 2px; margin-top: 14px;
-  background: linear-gradient(90deg, rgba(200,155,60,0), #C89B3C 50%, rgba(200,155,60,0));
+  background: linear-gradient(90deg, rgba(232,161,91,0), #E8A15B 50%, rgba(232,161,91,0));
 }
 .wk-cv .wk-cv-intro {
   width: 100%; max-width: none; margin: 0; font-size: .95rem; line-height: 1.7; color: #2B241D; text-align: center;
@@ -780,7 +780,7 @@ section.section.wk-habitats.wk-habitats {
   position: absolute; z-index: 5; top: calc(50% - 9px); transform: translateY(-50%);
   width: 48px; height: 48px; border-radius: 50%; padding: 0; cursor: pointer;
   display: grid; place-items: center;
-  background: #FFFDF8; color: #173B2A; border: 2px solid #C89B3C;
+  background: #FFFDF8; color: #173B2A; border: 2px solid #E8A15B;
   box-shadow: 0 10px 22px rgba(23,59,42,.28);
   transition: background .25s, color .25s, border-color .25s, box-shadow .25s, scale .25s;
 }
@@ -799,7 +799,7 @@ section.section.wk-habitats.wk-habitats {
   padding: 26px 24px 24px 28px;
   border-radius: 56px 10px 56px 10px;                 /* leaf cut, same language as the hero */
   background: linear-gradient(160deg, #1F4A36 0%, #173B2A 55%, #0F3024 100%);
-  border: 1px solid rgba(200,155,60,.5);
+  border: 1px solid rgba(232,161,91,.5);
   box-shadow: 0 12px 26px rgba(23,59,42,.22);
   overflow: hidden; color: #FFFDF8;
   transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s, border-color .35s;
@@ -810,7 +810,7 @@ section.section.wk-habitats.wk-habitats {
 }
 .wk-cv-card::after {               /* gold line that draws along the bottom */
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
-  background: linear-gradient(90deg, #E8A15B, #C89B3C);
+  background: linear-gradient(90deg, #E8A15B, #E8A15B);
   transform: scaleX(0); transform-origin: left; transition: transform .5s cubic-bezier(.2,.7,.2,1);
 }
 .wk-cv-card:hover { transform: translateY(-6px); border-color: #E8A15B; box-shadow: 0 20px 38px rgba(23,59,42,.34); }
@@ -852,7 +852,7 @@ section.section.wk-habitats.wk-habitats {
 
 /* ---- loop progress bar ---- */
 .wk-cv-bar { height: 3px; border-radius: 3px; background: rgba(23,59,42,.14); overflow: hidden; }
-.wk-cv-bar i { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, #C89B3C, #E8A15B); }
+.wk-cv-bar i { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, #E8A15B, #E8A15B); }
 
 /* ---- entrance ---- */
 .wk-cv.wk-js [data-cv] { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 90ms); }
@@ -870,14 +870,164 @@ section.section.wk-habitats.wk-habitats {
 }
 
 /* =====================================================
-   SECTION 6 — FAQ ("wk-fq")
+   SECTION 6 — Discover Our Wild Side ("wk-ds")
+   bg #173B2A (same green as sections 2 & 4). Compact, small side spacing.
+   It is a <div> (not <section>) so the white/orange alternation is untouched.
+   Layout: centered header, 4 animated counter cards, quote + button.
+   ===================================================== */
+.section.wk-ds.wk-ds {
+  background: #173B2A !important;
+  position: relative; overflow: hidden;
+  padding: clamp(32px, 4.5vw, 56px) 0;
+  font-family: 'Lato', 'Segoe UI', sans-serif;
+}
+.wk-ds, .wk-ds * { box-sizing: border-box; }
+.wk-ds .wk-ds-wrap.container {
+  position: relative; z-index: 1; max-width: 100%;
+  padding-left: clamp(16px, 2.5vw, 36px);
+  padding-right: clamp(16px, 2.5vw, 36px);
+}
+
+/* soft drifting glows + faint dot texture behind everything */
+.wk-ds-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.wk-ds-bg::before {
+  content: ""; position: absolute; inset: 0; opacity: .5;
+  background-image: radial-gradient(rgba(232,161,91,.16) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 0, transparent 100%);
+          mask-image: radial-gradient(ellipse 70% 80% at 50% 50%, #000 0, transparent 100%);
+}
+.wk-ds-bg i {
+  position: absolute; border-radius: 50%; filter: blur(60px);
+  background: radial-gradient(circle, rgba(232,161,91,.28), transparent 70%);
+  animation: wkDsDrift 14s ease-in-out infinite alternate;
+}
+.wk-ds-bg i:nth-child(1) { width: 340px; height: 340px; left: -90px; top: -120px; }
+.wk-ds-bg i:nth-child(2) { width: 300px; height: 300px; right: -80px; bottom: -120px; animation-delay: -6s; background: radial-gradient(circle, rgba(232,161,91,.26), transparent 70%); }
+@keyframes wkDsDrift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,26px) scale(1.15); } }
+
+/* ---- header ---- */
+.wk-ds-head { text-align: center; margin-bottom: 22px; }
+.wk-ds .wk-eyebrow { color: #E8A15B; }
+.wk-ds .wk-eyebrow::before { background: #E8A15B; }
+.wk-ds .wk-eyebrow::after { content: ""; width: 36px; height: 2px; background: #E8A15B; }
+.wk-ds h2 {
+  margin: 0 0 14px; width: 100%;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem); font-weight: 700; line-height: 1.12; letter-spacing: -.005em;
+  color: #FFFDF8 !important;
+}
+.wk-ds h2 .wk-ds-accent { color: #E8A15B; font-style: italic; }
+.wk-ds h2::after {
+  content: ""; display: block; width: 100%; height: 2px; margin-top: 14px;
+  background: linear-gradient(90deg, rgba(232,161,91,0), #E8A15B 50%, rgba(232,161,91,0));
+}
+.wk-ds .wk-ds-intro { width: 100%; max-width: none; margin: 0; font-size: .95rem; line-height: 1.7; color: rgba(255,253,248,.88); text-align: center; }
+
+/* ---- counter cards ---- */
+.wk-ds-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(14px, 1.8vw, 22px); }
+.wk-ds-card {
+  --mx: 50%; --my: 0%;
+  position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 26px 20px 24px;
+  border-radius: 56px 10px 56px 10px;                 /* leaf cut, same language as the other sections */
+  background: linear-gradient(160deg, #1F4A36 0%, #173B2A 55%, #0F3024 100%);
+  border: 1px solid rgba(232,161,91,.5);
+  box-shadow: 0 12px 26px rgba(0,0,0,.25);
+  overflow: hidden; color: #FFFDF8;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s, border-color .35s;
+}
+.wk-ds-card:nth-child(even) { border-radius: 10px 56px 10px 56px; }
+.wk-ds-card::before {              /* glow that follows the pointer */
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(240px circle at var(--mx) var(--my), rgba(232,161,91,.24), transparent 65%);
+}
+.wk-ds-card::after {               /* gold line that draws along the bottom */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  background: linear-gradient(90deg, #E8A15B, #E8A15B);
+  transform: scaleX(0); transform-origin: left; transition: transform .5s cubic-bezier(.2,.7,.2,1);
+}
+.wk-ds-card:hover { transform: translateY(-6px); border-color: #E8A15B; box-shadow: 0 20px 38px rgba(0,0,0,.38); }
+.wk-ds-card:hover::before { opacity: 1; }
+.wk-ds-card:hover::after { transform: scaleX(1); }
+
+.wk-ds-ico {
+  position: relative; width: 52px; height: 52px; border-radius: 50%; margin-bottom: 14px; display: grid; place-items: center;
+  background: rgba(232,161,91,.14); border: 1px solid rgba(232,161,91,.7); color: #E8A15B;
+  transition: background .3s, color .3s, transform .5s;
+}
+.wk-ds-ico::after {                /* pulse ring */
+  content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid rgba(232,161,91,.6);
+  animation: wkDsRing 2.8s ease-out infinite;
+}
+.wk-ds-card:nth-child(2) .wk-ds-ico::after { animation-delay: .7s; }
+.wk-ds-card:nth-child(3) .wk-ds-ico::after { animation-delay: 1.4s; }
+.wk-ds-card:nth-child(4) .wk-ds-ico::after { animation-delay: 2.1s; }
+@keyframes wkDsRing { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(1.7); opacity: 0; } }
+.wk-ds-ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.wk-ds-card:hover .wk-ds-ico { background: #E8A15B; color: #173B2A; transform: rotate(-8deg) scale(1.08); }
+
+.wk-ds-num {
+  position: relative; display: flex; align-items: baseline; justify-content: center; gap: 2px; margin-bottom: 6px;
+  font-family: 'Playfair Display', Georgia, serif; font-weight: 700; line-height: 1;
+  font-size: clamp(2.2rem, 3.6vw, 3rem); color: #FFFDF8; font-variant-numeric: tabular-nums;
+}
+.wk-ds-num sup { position: static; font-size: .6em; color: #E8A15B; font-style: italic; }
+.wk-ds-card h3 {
+  position: relative; margin: 0 0 8px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #E8A15B;
+}
+.wk-ds-card p {
+  position: relative; margin: 0; font-size: .9rem; line-height: 1.6; color: rgba(255,253,248,.85);
+}
+
+/* ---- COMPACT overrides: small, tight section ---- */
+.section.wk-ds.wk-ds { padding: clamp(22px, 2.6vw, 32px) 0; }
+.wk-ds-head { margin-bottom: 14px; }
+.wk-ds .wk-eyebrow { margin-bottom: 8px; }
+.wk-ds h2 { margin-bottom: 8px; }
+.wk-ds h2::after { margin-top: 8px; }
+.wk-ds .wk-ds-intro { font-size: .88rem; line-height: 1.55; }
+.wk-ds-grid { gap: clamp(10px, 1.2vw, 14px); }
+.wk-ds-card {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 12px; align-items: center;
+  text-align: left; padding: 12px 16px 12px 14px; border-radius: 28px 8px 28px 8px;
+}
+.wk-ds-card:nth-child(even) { border-radius: 8px 28px 8px 28px; }
+.wk-ds-ico { grid-row: 1 / span 3; width: 44px; height: 44px; margin: 0; }
+.wk-ds-ico svg { width: 20px; height: 20px; }
+.wk-ds-num { justify-content: flex-start; margin: 0 0 2px; font-size: clamp(1.6rem, 2.2vw, 2rem); }
+.wk-ds-card h3 { margin: 0 0 3px; font-size: .66rem; letter-spacing: .16em; }
+.wk-ds-card p { font-size: .8rem; line-height: 1.4; }
+
+/* ---- entrance ---- */
+.wk-ds.wk-js [data-ds] { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 90ms); }
+.wk-ds.wk-js.is-in [data-ds] { opacity: 1; transform: none; }
+.wk-ds.wk-js h2::after { transform: scaleX(0); transform-origin: center; transition: transform 1.1s .35s cubic-bezier(.2,.7,.2,1); }
+.wk-ds.wk-js.is-in h2::after { transform: scaleX(1); }
+.wk-ds.wk-js .wk-ds-card { opacity: 0; }
+.wk-ds.wk-js.is-in .wk-ds-card { opacity: 1; animation: wkDsIn .8s calc(var(--i, 0) * 120ms + .3s) cubic-bezier(.2,.7,.2,1) backwards; }
+@keyframes wkDsIn { from { opacity: 0; transform: translateY(32px) scale(.95); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-ds *, .wk-ds *::before, .wk-ds *::after { animation: none !important; transition: none !important; }
+  .wk-ds.wk-js [data-ds], .wk-ds.wk-js .wk-ds-card { opacity: 1; transform: none; }
+  .wk-ds.wk-js h2::after { transform: none; }
+}
+@media (max-width: 1000px) { .wk-ds-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .wk-ds-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* =====================================================
+   SECTION 7 — FAQ ("wk-fq")
    bg #173B2A (same green as section 2), compact, small side spacing.
    It is a <div> (not <section>) so the white/orange alternation is untouched.
    Left: a "visitor pass" ticket (photo + perforated stub + rotating stamp)
    Right: heading, intro and an editorial accordion
    ===================================================== */
 .section.wk-fq.wk-fq {
-  background: #173B2A !important;
+  background: #FFFDF8 !important;
   position: relative; overflow: hidden;
   padding: clamp(32px, 4.5vw, 56px) 0;
   font-family: 'Lato', 'Segoe UI', sans-serif;
@@ -889,7 +1039,7 @@ section.section.wk-habitats.wk-habitats {
   padding-right: clamp(16px, 2.5vw, 36px);
 }
 .wk-fq-head { text-align: center; margin-bottom: 22px; }
-.wk-fq .wk-eyebrow::after { content: ""; width: 36px; height: 2px; background: #C89B3C; }   /* mirrors the left line */
+.wk-fq .wk-eyebrow::after { content: ""; width: 36px; height: 2px; background: #E8A15B; }   /* mirrors the left line */
 .wk-fq-grid {
   display: grid; grid-template-columns: clamp(300px, 31vw, 410px) minmax(0, 1fr);
   gap: clamp(28px, 3.4vw, 52px);
@@ -900,8 +1050,8 @@ section.section.wk-habitats.wk-habitats {
 .wk-fq-visual { position: relative; align-self: stretch; min-height: 0; --stub: 140px; }   /* height = FAQ list height, so both end on the same line */
 .wk-fq-shadow {                  /* thin gold outline + soft shadow that follow the notched shape */
   position: absolute; inset: 0;
-  filter: drop-shadow(1.5px 0 0 #C89B3C) drop-shadow(-1.5px 0 0 #C89B3C)
-          drop-shadow(0 1.5px 0 #C89B3C) drop-shadow(0 -1.5px 0 #C89B3C)
+  filter: drop-shadow(1.5px 0 0 #E8A15B) drop-shadow(-1.5px 0 0 #E8A15B)
+          drop-shadow(0 1.5px 0 #E8A15B) drop-shadow(0 -1.5px 0 #E8A15B)
           drop-shadow(0 22px 26px rgba(0,0,0,.4));
 }
 .wk-fq-ticket {
@@ -971,7 +1121,7 @@ section.section.wk-habitats.wk-habitats {
 
 .wk-fq-stamp {                   /* rotating postmark on the ticket corner */
   position: absolute; z-index: 6; top: -18px; right: -14px; width: 92px; height: 92px; border-radius: 50%;
-  background: #173B2A; border: 1.5px solid #C89B3C; box-shadow: 0 10px 22px rgba(0,0,0,.4);
+  background: #173B2A; border: 1.5px solid #E8A15B; box-shadow: 0 10px 22px rgba(0,0,0,.4);
   display: grid; place-items: center;
 }
 .wk-fq-stamp svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: wkFqSpin 20s linear infinite; }
@@ -980,25 +1130,25 @@ section.section.wk-habitats.wk-habitats {
 @keyframes wkFqSpin { to { transform: rotate(360deg); } }
 
 /* ---- copy + accordion (right) ---- */
-.wk-fq .wk-eyebrow { color: #E8A15B; }
+.wk-fq .wk-eyebrow { color: #173B2A; }
 .wk-fq h2 {
   margin: 0 0 14px; width: 100%;
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-size: clamp(1.3rem, 2.2vw, 1.9rem); font-weight: 700; line-height: 1.12; letter-spacing: -.005em;
-  color: #FFFDF8 !important;
+  color: #173B2A !important;
 }
 .wk-fq h2 .wk-fq-accent { color: #E8A15B; font-style: italic; }
 .wk-fq h2::after {
   content: ""; display: block; width: 100%; height: 2px; margin-top: 14px;
   background: linear-gradient(90deg, rgba(232,161,91,0), #E8A15B 50%, rgba(232,161,91,0));
 }
-.wk-fq .wk-fq-intro { width: 100%; max-width: none; margin: 0; font-size: .95rem; line-height: 1.7; color: rgba(255,253,248,.88); text-align: center; }
+.wk-fq .wk-fq-intro { width: 100%; max-width: none; margin: 0; font-size: .95rem; line-height: 1.7; color: #2B241D; text-align: center; }
 
-.wk-fq-list { border-top: 1px solid rgba(200,155,60,.35); }
-.wk-fq-item { position: relative; border-bottom: 1px solid rgba(200,155,60,.35); }
+.wk-fq-list { border-top: 1px solid rgba(23,59,42,.18); }
+.wk-fq-item { position: relative; border-bottom: 1px solid rgba(23,59,42,.18); }
 .wk-fq-item::before {            /* soft sweep behind the row */
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
-  background: linear-gradient(90deg, rgba(232,161,91,.13), transparent 75%);
+  background: linear-gradient(90deg, rgba(232,161,91,.16), transparent 75%);
 }
 .wk-fq-item::after {             /* orange line that draws under an open row */
   content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
@@ -1010,21 +1160,21 @@ section.section.wk-habitats.wk-habitats {
 .wk-fq-q { margin: 0; font-size: inherit; position: relative; }
 .wk-fq-q button {
   width: 100%; display: flex; align-items: center; gap: 14px; padding: 11px 6px;
-  background: none; border: 0; cursor: pointer; text-align: left; color: #FFFDF8; font: inherit;
+  background: none; border: 0; cursor: pointer; text-align: left; color: #173B2A; font: inherit;
 }
 .wk-fq-q button:focus-visible { outline: 2px solid #E8A15B; outline-offset: -3px; }
 .wk-fq-n {
   flex: 0 0 auto; width: 40px; font-family: 'Playfair Display', Georgia, serif; font-size: 1.45rem; font-weight: 700; line-height: 1;
-  color: transparent; -webkit-text-stroke: 1px rgba(232,161,91,.75);
+  color: transparent; -webkit-text-stroke: 1px #E8A15B;
   transition: color .3s, -webkit-text-stroke-color .3s, transform .4s;
 }
-.wk-fq-item.is-open .wk-fq-n, .wk-fq-item:hover .wk-fq-n { color: #E8A15B; }
+.wk-fq-item.is-open .wk-fq-n, .wk-fq-item:hover .wk-fq-n { color: #E8A15B; -webkit-text-stroke-color: #E8A15B; }
 .wk-fq-item.is-open .wk-fq-n { transform: translateX(4px); }
 .wk-fq-t { flex: 1 1 auto; font-size: .98rem; font-weight: 700; line-height: 1.35; transition: color .3s; }
-.wk-fq-item.is-open .wk-fq-t { color: #E8A15B; }
+.wk-fq-item.is-open .wk-fq-t { color: #C9722A; }
 .wk-fq-pm {
   flex: 0 0 auto; position: relative; width: 28px; height: 28px; border-radius: 50%;
-  border: 1px solid rgba(232,161,91,.7); transition: background .3s, transform .4s;
+  border: 1px solid #E8A15B; transition: background .3s, transform .4s;
 }
 .wk-fq-pm::before, .wk-fq-pm::after {
   content: ""; position: absolute; left: 50%; top: 50%; background: #E8A15B; border-radius: 2px;
@@ -1040,10 +1190,10 @@ section.section.wk-habitats.wk-habitats {
 .wk-fq-a > div { overflow: hidden; min-height: 0; }
 .wk-fq-a p {
   position: relative; margin: 0; padding: 0 46px 14px 60px; font-size: .9rem; line-height: 1.65;
-  color: rgba(255,253,248,.86); text-align: justify; hyphens: manual;
+  color: #2B241D; text-align: justify; hyphens: manual;
 }
-.wk-fq-a p a { color: #E8A15B; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-.wk-fq-a p a:hover { color: #FFFDF8; }
+.wk-fq-a p a { color: #C9722A; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.wk-fq-a p a:hover { color: #173B2A; }
 .wk-fq.wk-js .wk-fq-item:not(.is-open) .wk-fq-a { grid-template-rows: 0fr; }
 .wk-fq.wk-js .wk-fq-item:not(.is-open) .wk-fq-a p { visibility: hidden; transition: visibility 0s .45s; }
 
@@ -1127,7 +1277,7 @@ section.section.wk-habitats.wk-habitats {
     <rect width="1440" height="600" fill="url(#wkBnSky)"/>
     <rect width="1440" height="600" fill="url(#wkBnGlow)"/>
     <circle cx="1130" cy="390" r="118" fill="#FFFDF8" opacity=".10"/>
-    <circle cx="1130" cy="390" r="84" fill="#C89B3C"/>
+    <circle cx="1130" cy="390" r="84" fill="#E8A15B"/>
     <g fill="none" stroke="#FFFDF8" stroke-opacity=".55" stroke-width="2.5" stroke-linecap="round">
       <path d="M820 170 q10 -11 20 0 q10 -11 20 0"/>
       <path d="M900 130 q8 -9 16 0 q8 -9 16 0"/>
@@ -1525,7 +1675,94 @@ section.section.wk-habitats.wk-habitats {
 })();
 </script>
 
-<!-- ============ SECTION 6 — FAQ ============ -->
+<!-- ============ SECTION 6 — DISCOVER OUR WILD SIDE ============ -->
+<div class="section wk-ds" role="region" aria-label="Discover Our Wild Side">
+  <div class="wk-ds-bg" aria-hidden="true"><i></i><i></i></div>
+  <div class="container wk-ds-wrap">
+
+    <div class="wk-ds-head">
+      <div data-ds style="--i:0"><span class="wk-eyebrow">Discover Our Wild Side</span></div>
+      <h2 data-ds style="--i:1">A Little More <span class="wk-ds-accent">Wild,</span> Every Day</h2>
+      <p class="wk-ds-intro" data-ds style="--i:2">Step into a world of amazing wildlife, explore fascinating habitats, and discover the beauty of nature. Every visit brings a new opportunity to learn, connect, and inspire a future where wildlife thrives.</p>
+    </div>
+
+    <div class="wk-ds-grid">
+      <article class="wk-ds-card" style="--i:0">
+        <span class="wk-ds-ico"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="11" r="1.8"/><circle cx="10.5" cy="6.5" r="1.8"/><circle cx="15.5" cy="6.5" r="1.8"/><circle cx="19" cy="11" r="1.8"/><path d="M12.8 12c-3 0-6 3-5.5 6 .4 2.2 2.6 2.4 5.5 1.3 2.9 1.1 5.1.9 5.5-1.3.5-3-2.5-6-5.5-6z"/></svg></span>
+        <div class="wk-ds-num"><span class="wk-ds-count" data-to="50">50</span><sup>+</sup></div>
+        <h3>Wildlife Species</h3>
+        <p>Meet fascinating animals from across the natural world.</p>
+      </article>
+      <article class="wk-ds-card" style="--i:1">
+        <span class="wk-ds-ico"><svg viewBox="0 0 24 24"><path d="M2.5 19.5l6.5-11 4 6.5 2.5-3.5 6 8z"/><path d="M9 8.5l1.7 2.7"/></svg></span>
+        <div class="wk-ds-num"><span class="wk-ds-count" data-to="12">12</span><sup>+</sup></div>
+        <h3>Natural Habitats</h3>
+        <p>Explore diverse environments filled with life and wonder.</p>
+      </article>
+      <article class="wk-ds-card" style="--i:2">
+        <span class="wk-ds-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></span>
+        <div class="wk-ds-num"><span class="wk-ds-count" data-to="365">365</span></div>
+        <h3>Days of Discovery</h3>
+        <p>Find something new to learn about wildlife every day.</p>
+      </article>
+      <article class="wk-ds-card" style="--i:3">
+        <span class="wk-ds-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9z"/></svg></span>
+        <div class="wk-ds-num"><span class="wk-ds-count" data-to="1">1</span></div>
+        <h3>Shared Planet</h3>
+        <p>Together, we can help protect nature for generations to come.</p>
+      </article>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  var sec = document.querySelector('.wk-ds');
+  if (!sec) return;
+  sec.classList.add('wk-js');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var counts = [].slice.call(sec.querySelectorAll('.wk-ds-count'));
+
+  /* count-up with ease-out */
+  function countUp() {
+    counts.forEach(function (el, k) {
+      var to = parseInt(el.getAttribute('data-to'), 10) || 0;
+      if (reduce || to <= 1) { el.textContent = to; return; }
+      var dur = 1800, delay = 500 + k * 120, t0 = null;
+      el.textContent = '0';
+      function step(t) {
+        if (t0 === null) t0 = t;
+        var p = Math.min(1, Math.max(0, (t - t0 - delay) / dur)), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(to * e);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  function reveal() { sec.classList.add('is-in'); countUp(); }
+
+  /* start numbers at 0 only when JS is running, then animate on scroll */
+  if (!reduce) counts.forEach(function (el) { el.textContent = '0'; });
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (e) {
+      if (e[0].isIntersecting) { reveal(); io.disconnect(); }
+    }, { threshold: 0.25 });
+    io.observe(sec);
+  } else { reveal(); }
+
+  /* glow follows the pointer */
+  [].forEach.call(sec.querySelectorAll('.wk-ds-card'), function (c) {
+    c.addEventListener('pointermove', function (e) {
+      var r = c.getBoundingClientRect();
+      c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+})();
+</script>
+
+<!-- ============ SECTION 7 — FAQ ============ -->
 <div class="section wk-fq" role="region" aria-label="Frequently Asked Questions">
   <div class="container wk-fq-wrap">
 

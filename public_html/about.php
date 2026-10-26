@@ -10,7 +10,7 @@ require '../includes/header.php';
   position: relative;
   height: 500px;
   background-color: #0B2F22;
-  background-image: url('../assets/images/static/zookeeper-feeding-baby-elephant-zoo.webp');
+  background-image: url('../assets/images/static/about-banner.webp');
   background-size: cover;
   background-position: center;
 }
@@ -59,7 +59,7 @@ require '../includes/header.php';
 .ab-hero-media {
   display: flex;
   margin: 0;
-  min-height: 340px;
+  min-height: 0;
   background: linear-gradient(160deg, #173B2A, #0B2F22);
 }
 .ab-hero-img {
@@ -69,11 +69,9 @@ require '../includes/header.php';
   overflow: hidden;
 }
 .ab-hero-img img {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;                 /* container poora bhara rahega */
-  object-position: center;
+  position: static;
   display: block;
+  width: 100%; height: auto;         /* poori image dikhti hai: na crop, na side space */
 }
 .ab-hero-tab {                       /* vertical label tab, image ke side me */
   flex: 0 0 38px;
@@ -97,6 +95,7 @@ require '../includes/header.php';
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-self: center;                /* text apni height leta hai, image ki height se match karne ke liye */
 }
 .ab-hero .ab-hero-text h2 {
   margin: 0 0 14px;
@@ -153,7 +152,7 @@ require '../includes/header.php';
 @media (max-width: 900px) {
   .ab-hero-main { grid-template-columns: 1fr; }
   .ab-hero-media { flex-direction: column; min-height: 0; }
-  .ab-hero-img { flex: 0 0 auto; height: 260px; }
+  .ab-hero-img { flex: 0 0 auto; height: auto; }
   .ab-hero-tab {
     flex: 0 0 auto;
     padding: 9px 16px;
@@ -171,7 +170,7 @@ require '../includes/header.php';
         <figure class="ab-hero-media">
           <figcaption class="ab-hero-tab">About Wildlife Kingdom</figcaption>
           <div class="ab-hero-img">
-            <img src="../assets/images/static/about-wildlife-kingdom.webp" alt="Wildlife Kingdom - where curiosity meets the wild" onerror="this.style.display='none'">
+            <img src="../assets/images/static/about-us-wildlife-kingdom-zoo-animal.webp" alt="Wildlife Kingdom - where curiosity meets the wild" onerror="this.style.display='none'">
           </div>
         </figure>
 
@@ -188,6 +187,43 @@ require '../includes/header.php';
     </div>
   </div>
 </section>
+
+<script>
+/* About intro: image container ko image ke size ke hisaab se fit karta hai.
+   Image poori dikhti hai (no crop), aur left/right me koi khaali jagah nahi bachti.
+   Image column sabse chhota size leta hai jisme image ki height text ki height ke barabar ho jaye. */
+(function () {
+  var main = document.querySelector('.ab-hero-main');
+  if (!main) return;
+  var media = main.querySelector('.ab-hero-media');
+  var tab   = main.querySelector('.ab-hero-tab');
+  var img   = main.querySelector('.ab-hero-img img');
+  var text  = main.querySelector('.ab-hero-text');
+  if (!media || !img || !text) return;
+
+  function fit() {
+    if (window.matchMedia('(max-width: 900px)').matches || !img.naturalWidth || img.style.display === 'none') {
+      main.style.gridTemplateColumns = '';          /* mobile: CSS ka stacked layout */
+      return;
+    }
+    var ratio = img.naturalWidth / img.naturalHeight;
+    var tabW  = tab ? tab.offsetWidth : 0;
+    var pct;
+    for (pct = 30; pct <= 64; pct += 1) {
+      main.style.gridTemplateColumns = pct + '% minmax(0, 1fr)';
+      var imgH = (media.clientWidth - tabW) / ratio;
+      if (imgH >= text.offsetHeight - 1) break;       /* image text jitni (ya zyada) lambi ho gayi */
+    }
+  }
+
+  var t;
+  function later() { clearTimeout(t); t = setTimeout(fit, 80); }
+  if (img.complete) fit(); else img.addEventListener('load', fit);
+  window.addEventListener('load', fit);
+  window.addEventListener('resize', later);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
 
 
 <style>

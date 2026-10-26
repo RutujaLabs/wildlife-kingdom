@@ -5,8 +5,113 @@ require '../includes/header.php';
 require '../config/db.php';
 
 $gallery = [];
-$result = $conn->query("SELECT * FROM gallery ORDER BY created_at DESC");
-if ($result) { while ($row = $result->fetch_assoc()) { $gallery[] = $row; } }
+$galleryDebug = [];
+
+/* ==================================================================
+   ADMIN PANEL SE AANE WALI IMAGES
+   ------------------------------------------------------------------
+   Admin panel ka table + columns yahan apne aap detect hote hain.
+   Sirf "Published" images dikhti hain, "Display order" ke hisaab se
+   (chhota number pehle).
+
+   Image file kis folder me padi hai uska list neeche hai
+   (server folder  =>  browser URL). Admin panel ka upload folder
+   alag ho to bas yahan ek line add kar do.
+================================================================== */
+$imageLocations = [
+  [__DIR__ . '/../uploads/gallery/', '../uploads/gallery/'],
+  [__DIR__ . '/../uploads/',         '../uploads/'],
+  // [__DIR__ . '/../admin/public/storage/', '../admin/public/storage/'],   // example
+];
+
+try {
+  $tables = [];
+  $tr = $conn->query("SHOW TABLES");
+  while ($t = $tr->fetch_row()) { $tables[] = $t[0]; }
+
+  $tbl = '';
+  foreach (['gallery_images', 'galleries', 'gallery', 'gallery_items', 'gallery_photos'] as $cand) {
+    if (in_array($cand, $tables, true)) { $tbl = $cand; break; }
+  }
+  if ($tbl === '') {
+    foreach ($tables as $t) { if (stripos($t, 'galler') !== false) { $tbl = $t; break; } }
+  }
+  $galleryDebug['table'] = $tbl;
+
+  if ($tbl !== '') {
+    $cols = [];
+    $cr = $conn->query("SHOW COLUMNS FROM `" . $tbl . "`");
+    while ($c = $cr->fetch_assoc()) { $cols[] = $c['Field']; }
+    $galleryDebug['columns'] = $cols;
+
+    $pick = function ($cands) use ($cols) {
+      foreach ($cands as $c) { if (in_array($c, $cols, true)) return $c; }
+      return '';
+    };
+    $cImg    = $pick(['image', 'image_path', 'image_url', 'photo', 'file_path', 'path', 'filename', 'file']);
+    $cTitle  = $pick(['title', 'name']);
+    $cCat    = $pick(['category', 'category_slug', 'type']);
+    $cAlt    = $pick(['alt_text', 'image_alt', 'alt']);
+    $cStatus = $pick(['status']);
+    $cOrder  = $pick(['display_order', 'sort_order', 'position']);
+    $cDate   = $pick(['created_at']);
+    $cDel    = $pick(['deleted_at']);
+
+    $where = [];
+    if ($cStatus) $where[] = "LOWER(`$cStatus`) IN ('published','active','1')";
+    if ($cDel)    $where[] = "`$cDel` IS NULL";
+    $order = [];
+    if ($cOrder)  $order[] = "`$cOrder` ASC";
+    if ($cDate)   $order[] = "`$cDate` DESC";
+    $sql = "SELECT * FROM `$tbl`"
+         . ($where ? ' WHERE ' . implode(' AND ', $where) : '')
+         . ($order ? ' ORDER BY ' . implode(', ', $order) : '');
+
+    if ($cImg !== '') {
+      $res = $conn->query($sql);
+      while ($row = $res->fetch_assoc()) {
+        $val = trim((string)($row[$cImg] ?? ''));
+        if ($val === '') { $galleryDebug['no_image_value'] = ($galleryDebug['no_image_value'] ?? 0) + 1; continue; }
+
+        $src = '';
+        if (preg_match('#^https?://#i', $val)) {
+          $src = $val;
+        } else {
+          foreach ($imageLocations as $loc) {
+            foreach ([ltrim($val, '/'), basename($val)] as $rel) {
+              if (is_file($loc[0] . $rel)) { $src = $loc[1] . $rel; break 2; }
+            }
+          }
+        }
+        if ($src === '') { $galleryDebug['file_not_found'][] = $val; continue; }
+
+        $gallery[] = [
+          'image'    => $val,
+          '_src'     => $src,
+          'title'    => $cTitle ? (string)($row[$cTitle] ?? '') : '',
+          'category' => $cCat   ? (string)($row[$cCat]   ?? '') : '',
+          'species'  => '',
+          'alt'      => $cAlt   ? (string)($row[$cAlt]   ?? '') : '',
+        ];
+      }
+    } else {
+      $galleryDebug['problem'] = 'Image column nahi mila';
+    }
+  } else {
+    $galleryDebug['problem'] = 'Gallery table nahi mila';
+  }
+  $galleryDebug['rows_used'] = count($gallery);
+} catch (Throwable $e) {
+  $gallery = [];
+  $galleryDebug['error'] = $e->getMessage();
+}
+
+/* Sirf apne computer (localhost) par:  gallery.php?gdebug=1  se check karo */
+if (isset($_GET['gdebug']) && in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
+  echo '<pre style="margin:0;padding:12px;background:#fff8e1;color:#333;font-size:13px;white-space:pre-wrap">';
+  echo htmlspecialchars(print_r($galleryDebug, true));
+  echo '</pre>';
+}
 
 /* ==================================================================
    IMAGE SLOTS  --  yahan se images add karo (DB ke bina bhi chalega)
@@ -60,7 +165,7 @@ $slotRows = [];
 foreach ($slots as $sl) {
   if (is_file(__DIR__ . '/../uploads/gallery/' . $sl['image'])) { $slotRows[] = $sl; }
 }
-$gallery = array_merge($slotRows, $gallery);
+$gallery = array_merge($gallery, $slotRows);   // admin panel wali images pehle
 
 
 /* ------------------------------------------------------------------
@@ -125,8 +230,9 @@ foreach ($gallery as $row) {
   foreach ($groups as $g) { $counts[$g]++; }
 
   $items[] = [
-    'src'    => '../uploads/gallery/' . $row['image'],
+    'src'    => $row['_src'] ?? ('../uploads/gallery/' . $row['image']),
     'title'  => $title !== '' ? $title : ($species !== '' ? $species : 'Wildlife'),
+    'alt'    => trim($row['alt'] ?? '') !== '' ? trim($row['alt']) : ($title !== '' ? $title : 'Wildlife'),
     'sub'    => $sub,
     'cat'    => $cat,
     'groups' => implode(' ', $groups),
@@ -139,6 +245,10 @@ $filters = [
   ['all', 'All'], ['mammals', 'Mammals'], ['birds', 'Birds'],
   ['reptiles', 'Reptiles'], ['big-cats', 'Big Cats'], ['habitats', 'Habitats'],
 ];
+
+/* Banner image ka "version": nayi image usi naam se save karo to browser purani cache wali image nahi dikhata */
+$galBannerFile = __DIR__ . '/../assets/images/static/gallery-banner.webp';
+$galBannerV    = is_file($galBannerFile) ? '?v=' . filemtime($galBannerFile) : '';
 ?>
 
 <style>
@@ -153,25 +263,23 @@ $filters = [
 .gal-banner { position: relative; overflow: hidden; height: 500px; background-color: #0B2F22; }
 .gal-banner::before {
   content: ""; position: absolute; inset: 0;
-  background: url('../assets/images/static/gallery-banner.webp') center / cover no-repeat;
-  animation: abG1Pan 18s ease-in-out infinite alternate;
+  background: url('../assets/images/static/gallery-banner.webp<?php echo $galBannerV; ?>') center / cover no-repeat;
 }
 .gal-banner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #e8b52a; }
-@keyframes abG1Pan { from { transform: scale(1); } to { transform: scale(1.08); } }
 
 /* ---------- section 1 ---------- */
 .ab-g1, .ab-g1 * { box-sizing: border-box; }
 .ab-g1 {
   position: relative; overflow: hidden;
   background: #FFFDF8; color: #173B2A;
-  padding: clamp(14px, 2vw, 26px) 0 clamp(16px, 2.2vw, 30px);
+  padding: clamp(26px, 3.4vw, 50px) 0 clamp(34px, 4.4vw, 64px);
   font-family: 'Lato', 'Segoe UI', sans-serif;
 }
 .ab-g1::before {
   content: ""; position: absolute; width: 300px; height: 300px; right: -110px; top: -140px;
   border-radius: 50%; border: 2px solid rgba(232, 161, 91, .25); pointer-events: none;
 }
-.ab-g1-wrap { position: relative; z-index: 1; max-width: 1700px; margin: 0 auto; padding: 0 clamp(6px, 1vw, 12px); }
+.ab-g1-wrap { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px); }
 
 /* reveal */
 .ab-g1.js-anim [data-r] { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; transition-delay: calc(var(--d, 0) * 1s); }
@@ -181,7 +289,7 @@ $filters = [
 .ab-g1-head {
   display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, .5fr);
   gap: clamp(14px, 3vw, 40px); align-items: center;
-  padding: 0 clamp(6px, 1vw, 12px); margin-bottom: clamp(10px, 1.4vw, 16px);
+  padding: 0; margin-bottom: clamp(16px, 2vw, 26px);
 }
 .ab-g1-label {
   display: inline-flex; align-items: center; gap: 10px;
@@ -212,7 +320,7 @@ $filters = [
 .ab-g1-words li.is-on { background-size: 100% 100%; transform: translateX(8px); }
 
 /* ---- filter bar with sliding indicator ---- */
-.ab-g1-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: clamp(8px, 1vw, 12px); padding: 0 clamp(6px, 1vw, 12px); }
+.ab-g1-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: clamp(12px, 1.4vw, 18px); padding: 0; }
 .ab-g1-filters {
   position: relative; display: inline-flex; gap: 2px; padding: 5px; max-width: 100%;
   background: #fff; border: 1px solid rgba(232, 161, 91, .6); border-radius: 999px;
@@ -244,7 +352,7 @@ $filters = [
 .ab-g1-grid {
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-auto-rows: clamp(140px, 15vw, 235px); grid-auto-flow: dense;
-  gap: clamp(6px, .8vw, 10px);
+  gap: clamp(8px, 1vw, 14px);
 }
 .ab-g1-tile {
   position: relative; display: block; overflow: hidden; text-decoration: none; cursor: zoom-in;
@@ -258,6 +366,13 @@ $filters = [
 .ab-g1-tile.gone { display: none; }
 .ab-g1-tile.big  { grid-column: span 2; grid-row: span 2; }
 .ab-g1-tile.tall { grid-row: span 2; }
+.ab-g1-tile.wide { grid-column: span 2; }
+.ab-g1-tile.hero { grid-column: 1 / -1; grid-row: span 2; }
+
+/* filter tab me sirf 1 ya 2 photo ho to: bahut bada crop hone ki jagah sahi size me, beech me */
+.ab-g1-grid.solo { grid-template-columns: minmax(0, 880px); justify-content: center; grid-auto-rows: clamp(260px, 38vw, 520px); }
+.ab-g1-grid.duo  { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: clamp(230px, 30vw, 460px); }
+.ab-g1-grid.solo .ab-g1-cap b, .ab-g1-grid.duo .ab-g1-cap b { font-size: clamp(1.05rem, 1.5vw, 1.35rem); }
 .ab-g1-tile.in:hover { transform: translateY(-3px); border-color: #E8A15B; box-shadow: 0 14px 26px rgba(11, 47, 34, .3); }
 .ab-g1-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s ease; }
 .ab-g1-tile:hover img { transform: scale(1.08); }
@@ -274,7 +389,7 @@ $filters = [
 .ab-g1-tile:hover .ab-g1-cap { transform: translateY(-3px); }
 .ab-g1-cap b { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(.86rem, 1.05vw, 1rem); font-weight: 600; line-height: 1.2; text-shadow: 0 1px 6px rgba(0, 0, 0, .45); }
 .ab-g1-cap i { font-style: normal; font-size: .58rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #E8A15B; }
-.ab-g1-tile.big .ab-g1-cap b { font-size: clamp(1.1rem, 1.6vw, 1.4rem); }
+.ab-g1-tile.big .ab-g1-cap b, .ab-g1-tile.hero .ab-g1-cap b { font-size: clamp(1.1rem, 1.6vw, 1.4rem); }
 .ab-g1-badge {
   position: absolute; top: 9px; left: 9px; z-index: 2;
   width: 30px; height: 30px; border-radius: 50%; background: #E8A15B;
@@ -330,6 +445,7 @@ $filters = [
 }
 @media (max-width: 640px) {
   .ab-g1-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: clamp(120px, 34vw, 170px); }
+  .ab-g1-grid.solo, .ab-g1-grid.duo { grid-template-columns: minmax(0, 1fr); grid-auto-rows: clamp(220px, 62vw, 340px); }
   .ab-g1-lb { padding: 56px 10px 20px; }
   .ab-g1-lb .lb-p { left: 6px; } .ab-g1-lb .lb-n { right: 6px; }
 }
@@ -381,7 +497,7 @@ $filters = [
            data-title="<?php echo htmlspecialchars($it['title']); ?>"
            data-sub="<?php echo htmlspecialchars($it['sub']); ?>"
            data-groups="<?php echo htmlspecialchars($it['groups']); ?>">
-          <img src="<?php echo htmlspecialchars($it['src']); ?>" alt="<?php echo htmlspecialchars($it['title']); ?>" loading="lazy"
+          <img src="<?php echo htmlspecialchars($it['src']); ?>" alt="<?php echo htmlspecialchars($it['alt']); ?>" loading="lazy"
                onerror="var a=this.closest('.ab-g1-tile');a.classList.add('broken');a.style.display='none'">
           <span class="ab-g1-badge" aria-hidden="true"><?php echo $it['emoji']; ?></span>
           <span class="ab-g1-cap">
@@ -450,8 +566,40 @@ $filters = [
   var none = document.getElementById('abG1None');
   var BATCH = 24, limit = BATCH, cur = 'all';
 
-  /* span rhythm (1x1 / tall / big): 12 tiles = 16 cells, so rows stay level */
-  var RHYTHM = ['big', '', '', 'tall', '', '', '', 'tall', '', '', '', ''];
+  /* ---- mosaic planner ----
+     Photos 2-row ke "band" me bante hain aur har band poora bharta hai, chahe 1 photo ho ya 50.
+     B = big (2x2)   T = tall (1x2)   W = wide (2x1)   H = hero (poori width x 2)   S = chhota (1x1)
+     Columns ke hisaab se (4 / 3 / 2) alag plan hai, isliye koi khaali jagah ya adhoori row nahi bachti. */
+  var PLANS = {
+    4: { 1: ['H'], 2: ['B','B'], 3: ['B','W','W'], 4: ['T','T','T','T'], 5: ['B','T','S','S'],
+         6: ['T','T','S','S','S','S'], 7: ['W','S','S','S','S','S','S'], 8: ['S','S','S','S','S','S','S','S'], cycle: [5, 6, 3, 4] },
+    3: { 1: ['H'], 2: ['B','T'], 3: ['T','T','T'], 4: ['W','S','W','S'], 5: ['W','S','S','S','S'],
+         6: ['S','S','S','S','S','S'], cycle: [2, 4, 3, 5] },
+    2: { 1: ['B'], 2: ['T','T'], 3: ['T','S','S'], 4: ['S','S','S','S'], cycle: [3, 1, 2] }
+  };
+  var CLS = { B: 'big', T: 'tall', W: 'wide', H: 'hero', S: '' };
+  var lastC = 0;
+
+  function colCount() {
+    var c = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+    return PLANS[c] ? c : 4;
+  }
+  function planFor(n, C) {
+    if (n <= 2) { return n === 2 ? ['S', 'S'] : ['S']; }   // 1-2 photo: solo / duo layout (CSS)
+    var P = PLANS[C], maxLen = 0, k;
+    for (k in P) { if (k !== 'cycle' && +k > maxLen) maxLen = +k; }
+    var out = [], rem = n, i = 0, len;
+    while (rem > 0) {
+      if (rem <= maxLen) { len = rem; }
+      else {
+        len = P.cycle[i++ % P.cycle.length];
+        if (rem - len === 1 && len > 1) len--;      // akela photo bachne se bachao
+      }
+      out = out.concat(P[len]);
+      rem -= len;
+    }
+    return out;
+  }
 
   /* tiles fade in as they scroll into view */
   var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function (es) {
@@ -478,11 +626,16 @@ $filters = [
     var all = tiles.filter(function (t) { return usable(t) && matches(t); });
     var vis = all.slice(0, limit);
     var idx = 0;
+    grid.classList.remove('solo', 'duo');
+    lastC = colCount();                       // pehle measure karo (solo/duo hata ke)
+    var plan = planFor(vis.length, lastC);
+    grid.classList.toggle('solo', vis.length === 1);
+    grid.classList.toggle('duo', vis.length === 2);
     tiles.forEach(function (t) {
       var show = vis.indexOf(t) > -1;
-      t.classList.remove('big', 'tall', 'out');
+      t.classList.remove('big', 'tall', 'wide', 'hero', 'out');
       if (show) {
-        var r = RHYTHM[idx % RHYTHM.length]; if (r) t.classList.add(r);
+        var r = CLS[plan[idx]]; if (r) t.classList.add(r);
         idx++;
         t.classList.remove('gone');
         if (animate || !t.classList.contains('in')) { t.classList.remove('in'); if (io) { io.unobserve(t); io.observe(t); } else { t.classList.add('in'); } }
@@ -509,6 +662,7 @@ $filters = [
     setTimeout(function () { layout(true); }, reduce ? 0 : 230);
   }
 
+  window.addEventListener('resize', function () { if (!grid.classList.contains('solo') && !grid.classList.contains('duo') && colCount() !== lastC) layout(false); });
   btns.forEach(function (b) { b.addEventListener('click', function () { setFilter(b.getAttribute('data-f'), b); }); });
   moreBtn.addEventListener('click', function () { limit += BATCH; layout(false); });
   window.addEventListener('resize', function () { var a = filters.querySelector('.is-active'); if (a) { ind.style.transition = 'none'; moveInd(a); void ind.offsetWidth; ind.style.transition = ''; } });

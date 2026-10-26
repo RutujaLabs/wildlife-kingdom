@@ -43,7 +43,7 @@
     .view-all:hover { color: #14633f; }
 
     .row-2 { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; }
-    .row-3 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, .8fr); gap: 22px; }
+    .row-3 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, .8fr); grid-template-rows: 430px; gap: 22px; align-items: stretch; }
 
     /* Chart */
     .range { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #e6dfd0; border-radius: 10px; padding: 7px 12px; font-size: .84rem; background: #fff; color: #2d3a38; }
@@ -67,7 +67,12 @@
     .qa.p { background: #eeeafc; } .qa.p .qi { background: #ddd4f7; color: #6a41c4; }
 
     /* Animals table */
-    .mini-table { width: 100%; border-collapse: collapse; }
+    .mini-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .mini-table th { text-align: left; }
+    .clamp1, .clamp2 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; line-height: 1.35; }
+    .clamp1 { -webkit-line-clamp: 1; line-clamp: 1; }
+    .clamp2 { -webkit-line-clamp: 2; line-clamp: 2; }
+    .pill { white-space: nowrap; }
     .mini-table th { background: #f6f3ec; color: #4b5a57; font-size: .78rem; font-weight: 600; padding: 9px 10px; border: 0; }
     .mini-table th:first-child { border-radius: 8px 0 0 8px; } .mini-table th:last-child { border-radius: 0 8px 8px 0; }
     .mini-table td { padding: 9px 10px; border-bottom: 1px solid #f1ece0; font-size: .86rem; vertical-align: middle; }
@@ -92,8 +97,29 @@
     .act-body { min-width: 0; }
     .empty-note { color: var(--muted); font-size: .9rem; padding: 18px 0; text-align: center; }
 
+    /* Bottom row: teeno blocks ki height barabar aur fixed. Naye records aane par bhi stretch nahi hota. */
+    .row-3 > .card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    .row-3 > .card .card-head { flex-shrink: 0; }
+    .row-3 .table-wrap, .row-3 .act-list { flex: 1; min-height: 0; overflow: hidden; }
+    .act .at, .act .as { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Animals table -> rows card ki poori height barabar bhar dete hain */
+    .row-3 .table-wrap { display: flex; flex-direction: column; }
+    .row-3 .mini-table { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    .row-3 .mini-table thead { display: block; flex-shrink: 0; }
+    .row-3 .mini-table tbody { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    .row-3 .mini-table tr { display: grid; grid-template-columns: 72px minmax(0, 1.1fr) minmax(0, .9fr) minmax(0, 1.7fr) 96px; align-items: center; }
+    .row-3 .mini-table th, .row-3 .mini-table td { min-width: 0; }
+    .row-3 .mini-table td { border-bottom: 0; }
+    .row-3 .mini-table tbody tr { flex: 1 1 0; min-height: 58px; max-height: 92px; border-bottom: 1px solid #f1ece0; }
+    .row-3 .mini-table tbody tr:last-child { border-bottom: 0; }
+
+    /* Activity list -> items bhi poori height barabar bhar dete hain */
+    .row-3 .act-list { display: flex; flex-direction: column; }
+    .row-3 .act { flex: 1 1 0; min-height: 62px; max-height: 84px; }
+
     /* Quote card */
-    .quote-card { position: relative; overflow: hidden; border-radius: 18px; min-height: 340px; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 18px 22px; color: #fff; text-align: center; background-color: #0b2a1d; background-image: linear-gradient(180deg, rgba(8,32,22,0) 60%, rgba(8,32,22,.8) 85%, rgba(8,32,22,.95) 100%), var(--quote-img, none); background-size: 100% 100%, 100% auto; background-position: center, top center; background-repeat: no-repeat; box-shadow: 0 8px 26px rgba(20,33,26,.12); }
+    .quote-card { position: relative; overflow: hidden; border-radius: 18px; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 18px 22px; color: #fff; text-align: center; background-color: #0b2a1d; background-image: linear-gradient(180deg, rgba(8,32,22,0) 60%, rgba(8,32,22,.8) 85%, rgba(8,32,22,.95) 100%), var(--quote-img, none); background-size: 100% 100%, cover; background-position: center, center top; background-repeat: no-repeat; box-shadow: 0 8px 26px rgba(20,33,26,.12); }
     .quote-card svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
     .quote-card .q, .quote-card .by, .quote-card .lf { position: relative; z-index: 1; }
     .quote-card .q { font-family: 'Playfair Display', serif; font-size: 1.12rem; line-height: 1.35; text-shadow: 0 2px 10px rgba(0,0,0,.55); }
@@ -102,16 +128,21 @@
 
     @media (max-width: 1200px) {
         .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .row-3 { grid-template-columns: 1fr 1fr; }
-        .quote-card { grid-column: 1 / -1; min-height: 260px; background-size: 100% 100%, cover; background-position: center, center 25%; }
+        .row-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 430px 300px; }
+        .quote-card { grid-column: 1 / -1; background-position: center, center 30%; }
     }
     @media (max-width: 900px) {
         .row-2, .row-3 { grid-template-columns: 1fr; }
+        .row-3 { grid-template-rows: none; }
+        .row-3 > .card { height: auto; }
+        .row-3 .table-wrap, .row-3 .act-list { overflow: visible; }
+        .quote-card { height: 320px; }
     }
     @media (max-width: 560px) {
         .stat-row { grid-template-columns: 1fr; }
         .qa-grid { grid-template-columns: 1fr; grid-template-rows: none; }
         .mini-table .hide-xs { display: none; }
+        .row-3 .mini-table tr { grid-template-columns: 72px minmax(0, 1fr) 96px; }
     }
 </style>
 @endpush
@@ -312,9 +343,9 @@
                                             @if($thumbUrl)<img src="{{ $thumbUrl }}" alt="{{ $animal->name }}" loading="lazy" onerror="this.remove()">@endif
                                         </div>
                                     </td>
-                                    <td class="a-name">{{ $animal->name }}</td>
-                                    <td class="hide-xs">{{ $animal->category ?? '-' }}</td>
-                                    <td class="hide-xs">{{ !empty($habitatName) ? $habitatName : '-' }}</td>
+                                    <td class="a-name"><div class="clamp2">{{ $animal->name }}</div></td>
+                                    <td class="hide-xs"><div class="clamp1">{{ $animal->category ?? '-' }}</div></td>
+                                    <td class="hide-xs"><div class="clamp2" title="{{ $habitatName }}">{{ !empty($habitatName) ? $habitatName : '-' }}</div></td>
                                     <td><span class="pill {{ $isActive ? '' : 'draft' }}">{{ $isActive ? 'Active' : ucfirst((string) $animal->status) }}</span></td>
                                 </tr>
                             @endforeach
@@ -334,6 +365,7 @@
                 </div>
                 <a href="{{ route('admin.animals.index') }}" class="view-all">View All <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
             </div>
+            <div class="act-list">
             @forelse($activity as $item)
                 <div class="act">
                     <div class="ai {{ $item['color'] }}">
@@ -356,6 +388,7 @@
             @empty
                 <div class="empty-note">No activity yet.</div>
             @endforelse
+            </div>
         </div>
 
         <div class="quote-card" style="--quote-img: url('{{ asset('images/wildlife-kingdom-quote.png') }}');">
