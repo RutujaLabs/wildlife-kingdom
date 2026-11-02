@@ -11,7 +11,7 @@
             <p style="max-width:550px; font-size:1.05rem; line-height:1.7; color: rgba(255,255,255,.86);">{{ $siteSettings->get('home_intro', 'Explore majestic species, rich habitats, seasonal events and unforgettable conservation stories at Wildlife Kingdom.') }}</p>
             <div style="display:flex; gap:16px; margin-top:24px; flex-wrap:wrap;">
                 <a href="{{ route('animals') }}" class="btn btn-gold">Meet the Animals</a>
-                <a href="../../public_html/tickets.php" class="btn btn-outline-dark" style="color:#fff; border-color:#fff;">Book Tickets</a>
+                <a href="{{ route('front.tickets.index') }}" class="btn btn-outline-dark" style="color:#fff; border-color:#fff;">Book Tickets</a>
             </div>
         </div>
     </div>

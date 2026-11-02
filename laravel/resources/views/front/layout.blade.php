@@ -73,7 +73,7 @@
             </ul>
         </nav>
 
-        <a href="../../public_html/tickets.php" class="btn btn-gold header-cta">Book Tickets</a>
+        <a href="{{ route('front.tickets.index') }}" class="btn btn-gold header-cta">Book Tickets</a>
 
         <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
             <span></span><span></span><span></span>
@@ -106,7 +106,7 @@
         <div class="footer-links">
             <h4>Visit</h4>
             <ul>
-                <li><a href="../../public_html/tickets.php">Tickets</a></li>
+                <li><a href="{{ route('front.tickets.index') }}">Tickets</a></li>
                 <li><a href="../../public_html/visit-us.php">Plan Your Visit</a></li>
                 <li><a href="../../public_html/conservation.php">Conservation</a></li>
                 <li><a href="../../public_html/contact.php">Contact</a></li>

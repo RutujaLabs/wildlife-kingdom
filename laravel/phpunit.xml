@@ -14,6 +14,7 @@
         </testsuite>
         <testsuite name="Public frontend pages">
             <file>tests/Feature/FrontendPagesTest.php</file>
+            <file>tests/Feature/TicketBookingTest.php</file>
         </testsuite>
     </testsuites>
     <source>
