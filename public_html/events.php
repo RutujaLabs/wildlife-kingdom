@@ -458,7 +458,7 @@ foreach ($events as $e) {
               </div>
 
               <div class="ev-actions">
-                <a href="visit-us.php" class="ev-btn ev-btn-solid">Plan Your Visit <span aria-hidden="true">&rarr;</span></a>
+                <a href="tickets.php" class="ev-btn ev-btn-solid">Plan Your Visit <span aria-hidden="true">&rarr;</span></a>
                 <?php if ($calLink !== ''): ?>
                   <a href="<?php echo htmlspecialchars($calLink, ENT_QUOTES); ?>" class="ev-btn ev-btn-line" target="_blank" rel="noopener">Add to Calendar</a>
                 <?php endif; ?>
@@ -474,7 +474,7 @@ foreach ($events as $e) {
           <b>🦁</b>
           <h3>No events scheduled right now</h3>
           <p>New wildlife events are added regularly. Check back soon, or plan a visit in the meantime.</p>
-          <a href="visit-us.php" class="ev-btn ev-btn-solid">Plan Your Visit <span aria-hidden="true">&rarr;</span></a>
+          <a href="tickets.php" class="ev-btn ev-btn-solid">Plan Your Visit <span aria-hidden="true">&rarr;</span></a>
         </div>
       <?php endif; ?>
 
@@ -521,7 +521,7 @@ foreach ($events as $e) {
       </div>
 
       <div class="ev-actions">
-        <a href="visit-us.php" class="ev-btn ev-btn-solid">Plan Your Visit <span aria-hidden="true">&rarr;</span></a>
+        <a href="tickets.php" class="ev-btn ev-btn-solid">Plan Your Visit <span aria-hidden="true">&rarr;</span></a>
         <a href="animals.php" class="ev-btn ev-btn-line">Explore Animals</a>
       </div>
 

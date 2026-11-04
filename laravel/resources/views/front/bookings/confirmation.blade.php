@@ -35,12 +35,19 @@
             @if($booking->booking_status === 'confirmed')
                 <p>Your ticket number is <strong>{{ $booking->ticket_number }}</strong>.</p>
                 <a class="btn btn-gold" href="{{ route('bookings.ticket.download', $booking) }}">Download PDF ticket</a>
+            @elseif($booking->booking_status === 'failed')
+                <p>No confirmed ticket was issued. To retry, start a new booking; this failed payment cannot be retried from an old payment form.</p>
+                @if($booking->ticket && $booking->ticket->status === 'active')
+                    <a class="btn btn-gold" href="{{ route('bookings.create', $booking->ticket) }}">Start a new booking to retry</a>
+                @else
+                    <a class="btn btn-gold" href="{{ route('front.tickets.index') }}">Choose another ticket to retry</a>
+                @endif
+            @elseif($booking->booking_status === 'cancelled')
+                <p>No payment was made and no ticket was issued. You can choose a ticket to start a new booking.</p>
             @elseif($booking->booking_status === 'pending')
                 <a class="btn btn-gold" href="{{ route('bookings.payment', $booking) }}">Continue to test payment</a>
-            @else
-                <p>No confirmed ticket was issued for this booking.</p>
             @endif
-            <a class="btn btn-outline-dark" href="{{ route('front.tickets.index') }}" style="margin-left:8px;">Back to tickets</a>
+            <a class="btn btn-outline-dark" href="{{ route('front.tickets.index') }}" style="margin-left:8px;">Choose tickets</a>
         </div>
     </div>
 </section>

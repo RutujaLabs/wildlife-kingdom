@@ -64,9 +64,11 @@ class TicketBookingTest extends TestCase
     {
         $ticket = Ticket::create(['ticket_type' => 'Family', 'price' => 27.50, 'status' => 'active']);
         $submissionToken = (string) Str::uuid();
-        $this->withSession(['booking_form_tokens' => [$submissionToken => true]]);
+        $this->withSession(['booking_form_tokens' => [
+            $submissionToken => now()->addMinutes((int) config('session.lifetime'))->timestamp,
+        ]]);
 
-        $this->post(route('bookings.store'), [
+        $response = $this->post(route('bookings.store'), [
             'submission_token' => $submissionToken,
             'ticket_id' => $ticket->id,
             'visit_date' => now()->addDay()->toDateString(),
@@ -75,9 +77,11 @@ class TicketBookingTest extends TestCase
             'visitor_email' => 'visitor@example.test',
             'visitor_phone' => '+1 555 0100',
             'price' => 0.01,
-        ])->assertRedirect();
+        ]);
 
         $booking = Booking::firstOrFail();
+        $response->assertRedirect(route('bookings.payment', $booking));
+        $this->get(route('bookings.payment', $booking))->assertOk()->assertSee('Test payment');
         $this->assertSame('27.50', $booking->unit_price);
         $this->assertSame('82.50', $booking->total_amount);
         $this->assertSame('pending', $booking->payment_status);
@@ -90,10 +94,74 @@ class TicketBookingTest extends TestCase
         $this->assertSame('confirmed', $booking->booking_status);
         $this->assertNotNull($booking->ticket_number);
         $this->assertNotNull($booking->verification_token);
+        $this->get(route('bookings.confirmation', $booking))
+            ->assertOk()
+            ->assertSee('Your test booking is confirmed')
+            ->assertSee('Download PDF ticket');
 
         $this->get(route('bookings.ticket.download', $booking))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_booking_form_tokens_remain_valid_across_more_than_ten_open_forms(): void
+    {
+        $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 15, 'status' => 'active']);
+        $firstForm = $this->get(route('bookings.create', $ticket))->assertOk();
+        $firstToken = $firstForm->viewData('submissionToken');
+
+        for ($i = 0; $i < 12; $i++) {
+            $this->get(route('bookings.create', $ticket))->assertOk();
+        }
+
+        $response = $this->post(route('bookings.store'), [
+            'submission_token' => $firstToken,
+            'ticket_id' => $ticket->id,
+            'visit_date' => now()->addDay()->toDateString(),
+            'ticket_quantity' => 1,
+            'visitor_name' => 'Visitor Example',
+            'visitor_email' => 'visitor@example.test',
+            'visitor_phone' => '+1 555 0100',
+        ]);
+
+        $booking = Booking::firstOrFail();
+        $response->assertRedirect(route('bookings.payment', $booking));
+        $this->assertDatabaseCount('bookings', 1);
+    }
+
+    public function test_expired_form_token_is_rejected_but_existing_booking_submission_remains_idempotent(): void
+    {
+        $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 15, 'status' => 'active']);
+        $submissionToken = (string) Str::uuid();
+        $payload = [
+            'submission_token' => $submissionToken,
+            'ticket_id' => $ticket->id,
+            'visit_date' => now()->addDay()->toDateString(),
+            'ticket_quantity' => 1,
+            'visitor_name' => 'Visitor Example',
+            'visitor_email' => 'visitor@example.test',
+            'visitor_phone' => '+1 555 0100',
+        ];
+        $this->withSession(['booking_form_tokens' => [
+            $submissionToken => now()->addMinutes((int) config('session.lifetime'))->timestamp,
+        ]]);
+        $this->post(route('bookings.store'), $payload)->assertRedirect();
+        $booking = Booking::firstOrFail();
+
+        $this->travel((int) config('session.lifetime') + 1)->minutes();
+        $this->withSession(['booking_form_tokens' => []]);
+        $this->post(route('bookings.store'), $payload)
+            ->assertRedirect(route('bookings.payment', $booking));
+        $this->assertDatabaseCount('bookings', 1);
+
+        $newToken = (string) Str::uuid();
+        $this->withSession(['booking_form_tokens' => [
+            $newToken => now()->subSecond()->timestamp,
+        ]]);
+        $this->post(route('bookings.store'), array_merge($payload, ['submission_token' => $newToken]))
+            ->assertSessionHasErrors([
+                'submission_token' => 'This booking form has expired. Please start again.',
+            ]);
     }
 
     public function test_failed_payment_never_issues_ticket_and_cannot_be_replayed_as_success(): void
@@ -102,6 +170,10 @@ class TicketBookingTest extends TestCase
 
         $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'failure'])
             ->assertRedirect(route('bookings.confirmation', $booking));
+        $this->get(route('bookings.confirmation', $booking))
+            ->assertOk()
+            ->assertSee('Test payment was not successful')
+            ->assertSee('Start a new booking to retry');
         $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success'])
             ->assertRedirect(route('bookings.confirmation', $booking));
 
@@ -117,7 +189,9 @@ class TicketBookingTest extends TestCase
     {
         $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 15, 'status' => 'active']);
         $submissionToken = (string) Str::uuid();
-        $this->withSession(['booking_form_tokens' => [$submissionToken => true]]);
+        $this->withSession(['booking_form_tokens' => [
+            $submissionToken => now()->addMinutes((int) config('session.lifetime'))->timestamp,
+        ]]);
         $payload = [
             'submission_token' => $submissionToken,
             'ticket_id' => $ticket->id,
@@ -147,6 +221,14 @@ class TicketBookingTest extends TestCase
         $booking->refresh();
         $this->assertSame('cancelled', $booking->payment_status);
         $this->assertNull($booking->ticket_number);
+        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success'])
+            ->assertRedirect(route('bookings.confirmation', $booking));
+        $booking->refresh();
+        $this->assertSame('cancelled', $booking->payment_status);
+        $this->get(route('bookings.confirmation', $booking))
+            ->assertOk()
+            ->assertSee('No payment was made')
+            ->assertSee('Choose tickets');
 
         $this->withSession(['booking_access' => []])
             ->get(route('bookings.confirmation', $booking))
@@ -222,7 +304,9 @@ class TicketBookingTest extends TestCase
     {
         $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 15, 'status' => 'active']);
         $submissionToken = (string) Str::uuid();
-        $this->withSession(['booking_form_tokens' => [$submissionToken => true]]);
+        $this->withSession(['booking_form_tokens' => [
+            $submissionToken => now()->addMinutes((int) config('session.lifetime'))->timestamp,
+        ]]);
 
         $this->post(route('bookings.store'), [
             'submission_token' => $submissionToken,

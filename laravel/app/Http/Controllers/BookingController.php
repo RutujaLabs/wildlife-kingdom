@@ -32,8 +32,12 @@ class BookingController extends Controller
             ->get();
         $submissionToken = (string) Str::uuid();
         $formTokens = session()->get('booking_form_tokens', []);
-        $formTokens[$submissionToken] = true;
-        session()->put('booking_form_tokens', array_slice($formTokens, -10, null, true));
+        $now = now()->timestamp;
+        $formTokens = is_array($formTokens)
+            ? array_filter($formTokens, static fn ($expiresAt) => is_numeric($expiresAt) && (int) $expiresAt >= $now)
+            : [];
+        $formTokens[$submissionToken] = now()->addMinutes((int) config('session.lifetime', 120))->timestamp;
+        session()->put('booking_form_tokens', $formTokens);
 
         return view('front.bookings.create', compact('ticket', 'tickets', 'submissionToken'));
     }
@@ -44,13 +48,6 @@ class BookingController extends Controller
             'submission_token' => ['required', 'uuid'],
         ]);
         $submissionToken = $tokenData['submission_token'];
-        $formTokens = session()->get('booking_form_tokens', []);
-
-        if (! is_array($formTokens) || ! isset($formTokens[$submissionToken])) {
-            throw ValidationException::withMessages([
-                'submission_token' => 'This booking form has expired. Please start again.',
-            ]);
-        }
 
         $existingBooking = Booking::query()
             ->where('submission_token', $submissionToken)
@@ -60,6 +57,15 @@ class BookingController extends Controller
             $this->grantVisitorAccess($existingBooking);
 
             return $this->bookingRedirect($existingBooking);
+        }
+
+        $formTokens = session()->get('booking_form_tokens', []);
+        $tokenExpiresAt = is_array($formTokens) ? ($formTokens[$submissionToken] ?? null) : null;
+
+        if (! is_numeric($tokenExpiresAt) || (int) $tokenExpiresAt < now()->timestamp) {
+            throw ValidationException::withMessages([
+                'submission_token' => 'This booking form has expired. Please start again.',
+            ]);
         }
 
         $validated = $request->validate([

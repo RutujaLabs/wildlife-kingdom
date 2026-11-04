@@ -1312,7 +1312,7 @@ section.section.wk-habitats.wk-habitats {
       </div>
       <div class="wk-actions">
         <a href="animals.php" class="btn btn-gold">Explore Wildlife</a>
-        <a href="visit-us.php" class="btn btn-outline">Plan Your Visit</a>
+        <a href="tickets.php" class="btn btn-outline">Plan Your Visit</a>
       </div>
     </div>
 
@@ -1526,7 +1526,7 @@ section.section.wk-habitats.wk-habitats {
             <p class="wk-cv-tag">Family Experiences</p>
             <h3>Create Meaningful Wildlife Memories</h3>
             <p class="wk-cv-txt">Bring your family and discover engaging activities that combine fun, learning, and memorable experiences with the natural world.</p>
-            <a href="visit-us.php" class="wk-cv-link">Plan Your Visit <span aria-hidden="true">→</span></a>
+            <a href="tickets.php" class="wk-cv-link">Plan Your Visit <span aria-hidden="true">→</span></a>
           </article>
           <article class="wk-cv-card" style="--i:5">
             <div class="wk-cv-top"><span class="wk-cv-ico"><svg viewBox="0 0 24 24"><circle cx="6.5" cy="11" r="1.8"/><circle cx="10.5" cy="6.5" r="1.8"/><circle cx="15.5" cy="6.5" r="1.8"/><circle cx="19" cy="11" r="1.8"/><path d="M12.8 12c-3 0-6 3-5.5 6 .4 2 2.4 2.4 5.5 2.4s5.1-.4 5.5-2.4c.5-3-2.5-6-5.5-6z"/></svg></span><span class="wk-cv-num" aria-hidden="true">06</span></div>

@@ -100,6 +100,7 @@
   .bk-table tbody td:first-child { padding-left: 22px; }
   .bk-table tbody tr:hover td { background: #fff8e3; }
   .bk-ref { color: var(--bk-text); text-decoration: underline; text-decoration-color: #c9a062; text-underline-offset: 3px; }
+  .bk-visitor-email { color: #6b7280; font-size: 13px; overflow-wrap: anywhere; }
   .bk-date-time { line-height: 1.3; font-size: 16px; }
   .bk-empty { text-align: center; padding: 40px 14px !important; color: #6b7280; }
 
@@ -250,7 +251,7 @@
               @endphp
               <tr>
                 <td><a class="bk-ref" href="{{ route('admin.bookings.show', $booking) }}">{{ $booking->booking_reference ?: '#'.$booking->id }}</a></td>
-                <td>{{ $booking->visitor_name }}</td>
+                <td>{{ $booking->visitor_name }}<br><span class="bk-visitor-email">{{ $booking->visitor_email }}</span></td>
                 <td>{{ $booking->visit_date->format('j M Y') }}</td>
                 <td>{{ $booking->ticket->ticket_type ?? '—' }}</td>
                 <td>{{ $booking->ticket_quantity }}</td>

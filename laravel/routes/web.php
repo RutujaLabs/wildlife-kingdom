@@ -12,7 +12,14 @@ use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [FrontendController::class, 'home'])->name('home');
+Route::get('/', function () {
+    $baseUrl = request()->getBaseUrl();
+    $siteRoot = $baseUrl !== ''
+        ? rtrim(dirname(dirname($baseUrl)), '/')
+        : '';
+
+    return redirect()->to($siteRoot.'/public_html/index.php');
+})->name('home');
 Route::get('/animals', [FrontendController::class, 'animals'])->name('animals');
 Route::get('/animals/{animal}', [FrontendController::class, 'animalDetails'])->name('animal.show');
 Route::get('/habitats', [FrontendController::class, 'habitats'])->name('habitats');

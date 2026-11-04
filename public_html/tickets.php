@@ -1,11 +1,10 @@
 <?php
 $pageTitle = 'Tickets';
-$pageCss = 'pages.css';
 require '../includes/header.php';
 require '../config/db.php';
 
 $tickets = [];
-$result = $conn->query("SELECT * FROM tickets ORDER BY price ASC");
+$result = $conn->query("SELECT * FROM tickets WHERE status = 'active' ORDER BY price ASC");
 if ($result) { while ($row = $result->fetch_assoc()) { $tickets[] = $row; } }
 
 /* Order: Adult, Child, Family Pass (baaki tickets price ke hisaab se baad mein) */
@@ -18,9 +17,9 @@ usort($tickets, function ($a, $b) use ($order) {
 
 /* ---- Card images (apni image files yahan set karo) ---- */
 $ticketImages = [
-  '../assets/images/tickets-lion.jpg',
-  '../assets/images/tickets-elephant.jpg',
-  '../assets/images/tickets-giraffe.jpg',
+  '../assets/images/static/magnificent-male-lion-standing-on-rocky-outcrop.webp',
+  '../assets/images/static/mother-and-baby-elephants-portrait.webp',
+  '../assets/images/static/zoo-safari-park-giraffe-habitat.webp',
 ];
 
 /* ---- Card icons (SVG) : person, child, family ---- */
@@ -44,7 +43,7 @@ $leaf = '<svg class="tk-leaf" viewBox="0 0 80 70" fill="none" stroke="#6f9a5a" s
     --tk-text: #2B241D;
   }
 
-  /* ---------- BANNER (500px, normal) ---------- */
+  /* ---------- BANNER ---------- */
   .tk-banner {
     position: relative; height: 500px; display: flex; align-items: center;
     background: linear-gradient(100deg, #173B2A 0%, #0B2F22 100%);
@@ -53,17 +52,17 @@ $leaf = '<svg class="tk-leaf" viewBox="0 0 80 70" fill="none" stroke="#6f9a5a" s
   }
   .tk-banner h1 {
     font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-weight: 700;
-    font-size: clamp(52px, 7vw, 82px); line-height: 1.05; margin: 6px 0 8px; color: var(--tk-green-dark);
+    font-size: clamp(42px, 7vw, 76px); line-height: 1.05; margin: 6px 0 12px; color: #fff;
   }
   .tk-banner p {
     font-family: 'Lato', 'Segoe UI', sans-serif; font-size: 18px; font-weight: 400;
-    color: #1d2b20; max-width: 560px; margin: 0;
+    color: rgba(255,255,255,.86); max-width: 560px; margin: 0;
   }
   .tk-banner .container { position: relative; z-index: 2; width: 100%; }
   .tk-eyebrow {
     display: flex; align-items: center; gap: 14px; margin-bottom: 4px;
     font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-weight: 600;
-    font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--tk-green);
+    font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--tk-orange);
   }
   .tk-eyebrow::before { content: ""; width: 46px; height: 2px; background: var(--tk-orange); }
 
@@ -163,7 +162,13 @@ $leaf = '<svg class="tk-leaf" viewBox="0 0 80 70" fill="none" stroke="#6f9a5a" s
 </style>
 
 <!-- ================= BANNER ================= -->
-<section class="tk-banner"></section>
+<section class="tk-banner">
+  <div class="container">
+    <span class="tk-eyebrow">Plan your visit</span>
+    <h1>Wildlife Kingdom Tickets</h1>
+    <p>Choose your ticket and get ready to explore amazing wildlife.</p>
+  </div>
+</section>
 
 <!-- ================= TICKETS ================= -->
 <section class="tk-section">
@@ -188,7 +193,7 @@ $leaf = '<svg class="tk-leaf" viewBox="0 0 80 70" fill="none" stroke="#6f9a5a" s
               <p class="tk-desc"><?php echo htmlspecialchars($ticket['description']); ?></p>
               <div class="tk-line"></div>
 
-              <a href="contact.php" class="tk-btn">
+              <a href="../laravel/public/tickets/<?php echo (int) $ticket['id']; ?>/book" class="tk-btn">
                 Book Now
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </a>

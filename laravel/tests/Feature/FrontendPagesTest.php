@@ -13,21 +13,10 @@ class FrontendPagesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_home_page_is_public_and_shows_published_content(): void
+    public function test_laravel_homepage_redirects_to_the_php_public_homepage(): void
     {
-        Animal::create([
-            'name' => 'Published Lion',
-            'status' => 'published',
-        ]);
-        Animal::create([
-            'name' => 'Draft Lion',
-            'status' => 'draft',
-        ]);
-
         $this->get(route('home'))
-            ->assertOk()
-            ->assertSee('Published Lion')
-            ->assertDontSee('Draft Lion');
+            ->assertRedirect(url('/public_html/index.php'));
     }
 
     public function test_public_animal_pages_only_show_published_animals(): void

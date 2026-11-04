@@ -1,3 +1,10 @@
+@php
+    $siteRoot = request()->getBaseUrl() !== ''
+        ? rtrim(dirname(dirname(request()->getBaseUrl())), '/')
+        : '';
+    $sharedAssets = $siteRoot.'/assets';
+    $publicHome = $siteRoot.'/public_html/index.php';
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,9 +43,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/home.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/header-navbar.css') }}">
+    <link rel="stylesheet" href="{{ $sharedAssets }}/css/style.css">
+    <link rel="stylesheet" href="{{ $sharedAssets }}/css/home.css">
+    <link rel="stylesheet" href="{{ $sharedAssets }}/css/header-navbar.css">
     @yield('styles')
     <style>
         :root { --wk-nav-green: #0B2F22; }
@@ -57,13 +64,13 @@
 
 <header class="site-header">
     <div class="header-inner">
-        <a href="{{ route('home') }}" class="logo">
-            <img src="{{ asset('assets/images/logo/wildlife-kingdom-header.png') }}" alt="{{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}">
+        <a href="{{ $publicHome }}" class="logo">
+            <img src="{{ $sharedAssets }}/images/logo/wildlife-kingdom-header.png" alt="{{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}">
         </a>
 
         <nav class="main-nav" id="mainNav">
             <ul>
-                <li><a href="{{ route('home') }}">Home</a></li>
+                <li><a href="{{ $publicHome }}">Home</a></li>
                 <li><a href="../../public_html/about.php">About Us</a></li>
                 <li><a href="{{ route('animals') }}">Animals</a></li>
                 <li><a href="{{ route('habitats') }}">Habitats</a></li>
@@ -86,8 +93,8 @@
 <footer class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand">
-            <a href="{{ route('home') }}" class="logo" aria-label="Wildlife Kingdom home">
-                <img src="{{ asset('assets/images/logo/wildlife-kingdom-header.png') }}" alt="{{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}">
+            <a href="{{ $publicHome }}" class="logo" aria-label="Wildlife Kingdom home">
+                <img src="{{ $sharedAssets }}/images/logo/wildlife-kingdom-header.png" alt="{{ $siteSettings->get('site_name', 'Wildlife Kingdom') }}">
             </a>
             <p class="footer-about">{{ $siteSettings->get('footer_about', 'A sanctuary for wonder, conservation, and discovery. Meet incredible animals, explore living habitats and connect with the natural world — every visit supports the wildlife we protect.') }}</p>
             @if($siteSettings->get('site_tagline'))<p class="footer-about">{{ $siteSettings->get('site_tagline') }}</p>@endif
@@ -127,7 +134,7 @@
     </div>
 </footer>
 
-<script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ $sharedAssets }}/js/main.js"></script>
 <script>
     (function () {
         var toggle = document.getElementById('navToggle');

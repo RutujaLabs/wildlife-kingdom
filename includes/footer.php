@@ -198,7 +198,7 @@ footer.site-footer .footer-bottom p { margin: 0; font-size: .84rem; color: #8fa0
       <div class="fcol-head"><h4>Visit</h4></div>
       <ul>
         <li><a href="tickets.php">Tickets</a></li>
-        <li><a href="visit-us.php">Plan Your Visit</a></li>
+        <li><a href="tickets.php">Plan Your Visit</a></li>
         <li><a href="conservation.php">Conservation</a></li>
         <li><a href="contact.php">Contact</a></li>
       </ul>
