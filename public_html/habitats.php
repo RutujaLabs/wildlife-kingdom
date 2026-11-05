@@ -41,7 +41,7 @@ foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg',
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
 
 .hb-page {
-  --sw-white:#FFFDF8; --sw-orange:#E8A15B; --sw-forest:#173B2A; --sw-dark:#0B2F22; --sw-gold:#C89B3C; --sw-text:#2B241D;
+  --sw-white:#FFFDF8; --sw-orange:#E8A15B; --sw-forest:#173B2A; --sw-dark:#0B2F22; --sw-gold:#E8A15B; --sw-text:#2B241D;
   font-family:'Lato','Segoe UI',sans-serif; color:var(--sw-text);
 }
 .hb-page, .hb-page * { box-sizing:border-box; }
@@ -69,7 +69,7 @@ foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg',
 .hb-head h2::after { content:""; display:block; width:56px; height:3px; margin:10px auto 0; background:var(--sw-gold); border-radius:2px; }
 .hb-head p { max-width:none; width:100%; margin:10px 0 0; line-height:1.6; }
 .hb-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
-.hb-card { position:relative; display:block; aspect-ratio:16/10; border-radius:14px; overflow:hidden; text-decoration:none; background:linear-gradient(160deg,#2E5B44,#0B2F22); border:1px solid rgba(200,155,60,.55); box-shadow:0 8px 22px rgba(23,59,42,.16); transition:transform .3s,box-shadow .3s,border-color .3s; }
+.hb-card { position:relative; display:block; aspect-ratio:16/10; border-radius:14px; overflow:hidden; text-decoration:none; background:linear-gradient(160deg,#2E5B44,#0B2F22); border:1px solid rgba(232,161,91,.55); box-shadow:0 8px 22px rgba(23,59,42,.16); transition:transform .3s,box-shadow .3s,border-color .3s; }
 .hb-card:hover { transform:translateY(-4px); border-color:var(--sw-gold); box-shadow:0 16px 34px rgba(23,59,42,.26); }
 .hb-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .6s; }
 .hb-card:hover img { transform:scale(1.06); }
@@ -88,7 +88,7 @@ foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg',
 
 .hb-media { margin:0; }
 .hb-frame { position:relative; aspect-ratio:16/10; border-radius:80px 16px 80px 16px; overflow:hidden; background:linear-gradient(160deg,#FBE9CC,#F3C48C); box-shadow:0 16px 36px rgba(11,47,34,.28); }
-.hb-frame::after { content:""; position:absolute; inset:9px; z-index:2; pointer-events:none; border:1.5px solid rgba(200,155,60,.9); border-radius:72px 9px 72px 9px; }
+.hb-frame::after { content:""; position:absolute; inset:9px; z-index:2; pointer-events:none; border:1.5px solid rgba(232,161,91,.9); border-radius:72px 9px 72px 9px; }
 .hb-frame img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .hb-frame-ph { position:absolute; inset:0; display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; color:var(--sw-forest); font-weight:700; }
 .hb-frame-ph b { font-size:2.6rem; font-weight:400; }
@@ -104,7 +104,7 @@ foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg',
 .hb-desc { margin:10px 0 0; line-height:1.7; font-size:.98rem; max-width:68ch; }
 .is-green .hb-desc { color:rgba(255,253,248,.92); }
 .hb-facts { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 0; padding:0; list-style:none; }
-.hb-facts li { padding:8px 14px; border-radius:10px; background:var(--sw-white); border:1px solid rgba(200,155,60,.7); min-width:130px; }
+.hb-facts li { padding:8px 14px; border-radius:10px; background:var(--sw-white); border:1px solid rgba(232,161,91,.7); min-width:130px; }
 .hb-facts small { display:block; font-size:.72rem; color:var(--sw-forest); opacity:.75; }
 .hb-facts strong { display:block; margin-top:1px; font-size:.92rem; color:var(--sw-forest); }
 .hb-text .hb-btn { margin-top:18px; }
@@ -112,7 +112,7 @@ foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg',
 .is-green .hb-btn-dark:hover { background:var(--sw-white); border-color:var(--sw-white); }
 
 /* ================= EMPTY + CTA ================= */
-.hb-empty { grid-column:1/-1; text-align:center; padding:36px 20px; border:2px dashed rgba(200,155,60,.6); border-radius:14px; background:#fff; }
+.hb-empty { grid-column:1/-1; text-align:center; padding:36px 20px; border:2px dashed rgba(232,161,91,.6); border-radius:14px; background:#fff; }
 
 @media (max-width:980px) { .hb-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:820px) {

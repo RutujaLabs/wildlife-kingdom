@@ -118,12 +118,12 @@ require '../includes/header.php';
 .an-card-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .an-card:hover .an-card-img img { transform: scale(1.05); }
 .an-tag {
-  position: absolute; z-index: 2; left: 18px; bottom: -14px; display: inline-flex; align-items: center; gap: 6px;
+  position: absolute; z-index: 2; left: 18px; top: -14px; display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 14px; font-size: .72rem; font-weight: 700; color: var(--sw-forest);
   background: var(--sw-white); border-radius: 999px; box-shadow: 0 4px 12px rgba(23,59,42,.18);
 }
 .an-tag svg { width: 13px; height: 13px; fill: var(--sw-forest); stroke: none; }
-.an-card-body { display: flex; flex-direction: column; flex: 1 1 auto; padding: 26px 20px 18px; }
+.an-card-body { position: relative; display: flex; flex-direction: column; flex: 1 1 auto; padding: 26px 20px 18px; }
 .an-card h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.12rem; font-weight: 700; color: var(--sw-forest); }
 .an-card p { margin: 8px 0 16px; font-size: .82rem; line-height: 1.6; color: rgba(43,36,29,.72); }
 .an-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
@@ -228,9 +228,9 @@ require '../includes/header.php';
                   <img src="../uploads/animals/<?= an_e(rawurlencode($animal['image'])) ?>"
                        alt="<?= an_e($animal['name']) ?>" loading="lazy" onerror="this.style.display='none'">
                 <?php endif; ?>
-                <span class="an-tag"><?= an_icon('paw') ?><?= an_e($cat) ?></span>
               </div>
               <div class="an-card-body">
+                <span class="an-tag"><?= an_icon('paw') ?><?= an_e($cat) ?></span>
                 <h3><?= an_e($animal['name']) ?></h3>
                 <?php if ($text !== ''): ?><p><?= an_e(an_cut($text, 100)) ?></p><?php endif; ?>
                 <div class="an-card-foot">
