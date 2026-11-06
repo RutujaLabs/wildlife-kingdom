@@ -732,7 +732,7 @@ require '../includes/header.php';
           </div>
         <?php endif; ?>
 
-        <a href="animals.php" class="ad-btn">&larr; Back to All Animals</a>
+        <a href="animals" class="ad-btn">&larr; Back to All Animals</a>
 
         <?php if (count($classif) > 0 || count($range) > 0): ?>
         <div class="ad-minis">
@@ -868,11 +868,11 @@ require '../includes/header.php';
           <h2 class="ad-h2"><?= ad_icon('paw') ?>Related Animals</h2>
           <p class="ad-sub">Discover other amazing animals that share the same habitat or are part of the same ecosystem.</p>
         </div>
-        <a class="ad-link" href="animals.php">View All &rarr;</a>
+        <a class="ad-link" href="animals">View All &rarr;</a>
       </div>
       <div class="ad-related">
         <?php foreach ($related as $r): ?>
-          <a class="ad-rel" href="animal-details.php?id=<?= (int)$r['id'] ?>">
+          <a class="ad-rel" href="animal-details?id=<?= (int)$r['id'] ?>">
             <span class="ad-rel-img">
               <?php if (!empty($r['image'])): ?>
                 <img src="<?= ad_e(ad_path($r['image'])) ?>" alt="<?= ad_e($r['name']) ?>" loading="lazy" onerror="this.style.display='none'">
@@ -895,7 +895,7 @@ require '../includes/header.php';
     <div class="container">
       <h2>Animal not found</h2>
       <p style="margin-top:12px;">This animal may have been removed, or the link is incorrect.</p>
-      <a href="animals.php" class="btn btn-gold" style="margin-top:24px;">Browse All Animals</a>
+      <a href="animals" class="btn btn-gold" style="margin-top:24px;">Browse All Animals</a>
     </div>
   </section>
 

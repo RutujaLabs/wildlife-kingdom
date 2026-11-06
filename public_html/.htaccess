@@ -1,0 +1,22 @@
+# ==========================================================
+#  Clean URLs: .php extension hide karna
+#  index.php  ->  index      animal-details.php?id=3 -> animal-details?id=3
+# ==========================================================
+DirectoryIndex index.php index.html
+Options -MultiViews
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# 1) Koi .php wala URL kholey to clean URL par bhej do (sirf GET/HEAD, taaki forms/POST na toote)
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+RewriteCond %{THE_REQUEST} ^[A-Z]+\s(/[^?\s]*)\.php(?:\?[^\s]*)?\sHTTP/ [NC]
+RewriteRule ^ %1 [R=301,L]
+
+# 2) Clean URL ko andar se asli .php file par bhej do
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+)$ $1.php [L]
+</IfModule>

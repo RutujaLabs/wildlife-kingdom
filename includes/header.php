@@ -159,24 +159,24 @@ if (isset($pageCss)) {
 
 <header class="site-header">
   <div class="header-inner">
-    <a href="index.php" class="logo">
+    <a href="index" class="logo">
       <img src="../assets/images/logo/wildlife-kingdom-header.png" alt="Wildlife Kingdom" onerror="this.style.display='none'">
      
     </a>
 
     <nav class="main-nav" id="mainNav">
       <ul>
-        <li><a href="index.php">Home</a></li>
-        <li><a href="about.php">About Us</a></li>
-        <li><a href="animals.php">Animals</a></li>
-        <li><a href="habitats.php">Habitats</a></li>
-        <li><a href="events.php">Events</a></li>
-        <li><a href="gallery.php">Gallery</a></li>
-        <li><a href="contact.php">Contact Us</a></li>
+        <li><a href="index">Home</a></li>
+        <li><a href="about">About Us</a></li>
+        <li><a href="animals">Animals</a></li>
+        <li><a href="habitats">Habitats</a></li>
+        <li><a href="events">Events</a></li>
+        <li><a href="gallery">Gallery</a></li>
+        <li><a href="contact">Contact Us</a></li>
       </ul>
     </nav>
 
-    <a href="tickets.php" class="btn btn-gold header-cta">Book Tickets</a>
+    <a href="tickets" class="btn btn-gold header-cta">Book Tickets</a>
 
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
       <span></span><span></span><span></span>

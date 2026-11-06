@@ -1,7 +1,46 @@
 <?php
-$pageTitle = 'Events';
-$pageCss = 'pages.css';
-$metaDescription = 'Join guided safari walks, conservation talks and family wildlife encounters at Wildlife Kingdom. See upcoming events and plan your visit.';
+// ================= SEO SETTINGS (edit here) =================
+$pageTitle       = 'Events';
+$pageCss         = 'pages.css';
+$seoTitle        = 'Wildlife Events & Safari Walks | Wildlife Kingdom Events';
+$seoDescription  = 'Join guided safari walks, conservation talks and family wildlife encounters at Wildlife Kingdom. See upcoming events and plan your visit.';
+$seoKeywords     = 'wildlife kingdom events, safari walks, conservation talks, family events, zoo events, animal encounters, wildlife park events';
+$seoPublisher    = 'Wildlife Kingdom';
+$seoRobots       = 'index, follow, max-image-preview:large';
+
+// Canonical URL (current page, without query string)
+$seoScheme    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$seoCanonical = $seoScheme . '://' . $_SERVER['HTTP_HOST'] . strtok($_SERVER['REQUEST_URI'], '?');
+
+// X-Robots-Tag HTTP header
+header('X-Robots-Tag: ' . $seoRobots);
+
+// Output buffer: injects/fixes SEO tags in <head> without touching header.php
+ob_start(function ($html) use ($seoTitle, $seoDescription, $seoKeywords, $seoPublisher, $seoRobots, $seoCanonical) {
+    if (stripos($html, '</head>') === false) { return $html; }
+    $e = function ($s) { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); };
+
+    // remove existing tags so nothing is duplicated
+    $html = preg_replace('#<title>.*?</title>#is', '', $html, 1);
+    $html = preg_replace('#<meta\s+name=["\'](description|keywords|robots|publisher)["\'][^>]*>\s*#i', '', $html);
+    $html = preg_replace('#<link\s+rel=["\']canonical["\'][^>]*>\s*#i', '', $html);
+    $html = preg_replace('#<link\s+rel=["\']publisher["\'][^>]*>\s*#i', '', $html);
+
+    $tags  = "<title>" . $e($seoTitle) . "</title>\n";
+    $tags .= '<meta name="description" content="' . $e($seoDescription) . "\">\n";
+    $tags .= '<link rel="canonical" href="' . $e($seoCanonical) . "\">\n";
+    $tags .= '<meta name="robots" content="' . $e($seoRobots) . "\">\n";
+    $tags .= '<meta name="keywords" content="' . $e($seoKeywords) . "\">\n";
+    $tags .= '<meta name="publisher" content="' . $e($seoPublisher) . "\">\n";
+    $tags .= '<meta property="og:title" content="' . $e($seoTitle) . "\">\n";
+    $tags .= '<meta property="og:description" content="' . $e($seoDescription) . "\">\n";
+    $tags .= '<meta property="og:url" content="' . $e($seoCanonical) . "\">\n";
+    $tags .= "<meta property=\"og:type\" content=\"website\">\n";
+
+    return preg_replace('#</head>#i', $tags . '</head>', $html, 1);
+});
+// ============================================================
+
 require '../includes/header.php';
 require '../config/db.php';
 
