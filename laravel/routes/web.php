@@ -18,7 +18,7 @@ Route::get('/', function () {
         ? rtrim(dirname(dirname($baseUrl)), '/')
         : '';
 
-    return redirect()->to($siteRoot.'/public_html/index.php');
+    return redirect()->route('animals');
 })->name('home');
 Route::get('/animals', [FrontendController::class, 'animals'])->name('animals');
 Route::get('/animals/{animal}', [FrontendController::class, 'animalDetails'])->name('animal.show');
