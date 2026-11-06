@@ -21,9 +21,18 @@ require '../includes/header.php';
   height: 4px;
   background: #e8b52a;
 }
+/* Mobile photo: desktop par hidden, desktop banner bilkul waisa hi rehta hai */
+.about-banner-mobile { display: none; }
+/* MOBILE ONLY: image container ko poora bharti hai (koi khali jagah nahi, crop nahi). Desktop same rehta hai. */
+@media (max-width: 768px) {
+  .about-banner { height: auto; aspect-ratio: 5 / 2; background-image: none; line-height: 0; }   /* 360px screen par ~144px; badhana ho to 5 / 2 ko 2 / 1 karo */
+  .about-banner-mobile { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+}
 </style>
 
-<section class="about-banner" role="img" aria-label="Zookeeper feeding a baby elephant at Wildlife Kingdom"></section>
+<section class="about-banner" role="img" aria-label="Zookeeper feeding a baby elephant at Wildlife Kingdom">
+  <img class="about-banner-mobile" src="../assets/images/static/about-banner.webp" alt="" aria-hidden="true" loading="lazy" decoding="async">
+</section>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');

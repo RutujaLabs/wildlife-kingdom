@@ -23,6 +23,22 @@ function ad_path($f) {
     if (strpos($f, '/') !== false) return '../' . $f;
     return '../uploads/animals/' . rawurlencode($f);
 }
+/* Apni (manual) images: assets/images/static/ me rakho. File mil jaye to path apne aap ban jata hai.
+   Pehle us animal ke slug wala naam dekhta hai (e.g. animal-details-banner-giraffe.webp), phir common naam
+   (animal-details-banner.webp). Extension: .webp / .jpg / .jpeg / .png. Nayi image se replace karoge to cache refresh ho jata hai. */
+function ad_static($base, $slug = '') {
+    $dir = __DIR__ . '/../assets/images/static/';
+    $names = [];
+    if ($slug !== '') $names[] = $base . '-' . $slug;
+    $names[] = $base;
+    foreach ($names as $n) {
+        foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
+            $p = $dir . $n . '.' . $ext;
+            if (is_file($p)) return '../assets/images/static/' . $n . '.' . $ext . '?v=' . filemtime($p);
+        }
+    }
+    return '';
+}
 /* plain text from the rich-text editor HTML */
 function ad_plain($html) {
     $html = preg_replace('/<\/(p|li|div|h\d)>|<br\s*\/?>/i', ' ', (string)$html);
@@ -33,8 +49,11 @@ function ad_cut($s, $n) {
     return strlen($s) > $n ? substr($s, 0, $n - 1) . '…' : $s;
 }
 /* safe version of the rich-text editor HTML (bold, italic, lists, links only) */
-function ad_rich($html) {
+function ad_rich_raw($html) {
     $html = (string)$html;
+    /* stray ">" (admin data me galti se aa jaata hai) shuru se hata do */
+    $html = preg_replace('/^(?:\s|\x{200B}|\x{FEFF}|\x{00A0}|&nbsp;|&gt;|&amp;gt;|&#0*62;|&#x0*3e;|>)+/iu', '', $html);
+    $html = preg_replace('/^((?:<(?:p|div|br)[^>]*>\s*)+)(?:&nbsp;|&gt;|>)+\s*/iu', '$1', $html);
     if ($html === strip_tags($html)) return nl2br(htmlspecialchars($html, ENT_QUOTES, 'UTF-8'));
     $html = strip_tags($html, '<p><br><strong><b><em><i><u><ul><ol><li><a><h3><h4>');
     return preg_replace_callback('/<(\/?)([a-z0-9]+)([^>]*)>/i', function ($m) {
@@ -48,6 +67,13 @@ function ad_rich($html) {
         }
         return '<' . $tag . '>';
     }, $html);
+}
+/* ad_rich + final safety: output ke shuru ka koi bhi akela ">" hata do */
+function ad_rich($html) {
+    $out = ad_rich_raw($html);
+    $out = preg_replace('/^((?:\s|<\/?(?:p|div|br|span)[^>]*>)*)(?:&gt;|&amp;gt;|&#0*62;|&#x0*3e;|>)+\s*(?:<br\s*\/?>\s*)*/iu', '$1', $out);
+    $out = preg_replace('/<p>\s*(?:&gt;|&amp;gt;|>)*\s*<\/p>/iu', '', $out);
+    return $out;
 }
 function ad_label($key) { return ucwords(trim(str_replace(['_', '-'], ' ', $key))); }
 /* JSON array or comma / new-line separated list  ->  array */
@@ -228,7 +254,7 @@ if ($animal) {
     $habText = ''; $consText = ''; $moreBlocks = [];
     foreach ($blocks as $b) {
         if ($habText === '' && preg_match('/habitat|behav|range/i', $b[0])) { $habText = $b[2]; continue; }
-        if ($consText === '' && preg_match('/conserv|threat|protect/i', $b[0])) { $consText = $b[2]; continue; }
+        if (preg_match('/conserv|threat|protect/i', $b[0])) { continue; } /* Conservation & Threats section hata diya gaya */
         $moreBlocks[] = $b;
     }
     if ($consText === '' && $status !== '') {
@@ -284,8 +310,14 @@ if ($animal) {
     }
 
     $related = array_slice($related, 0, 4);
-    $habImg  = isset($gallery[1]) ? $gallery[1]['src'] : $mainImg;
-    $consImg = isset($gallery[2]) ? $gallery[2]['src'] : $mainImg;
+    /* Admin panel wali image: SIRF "Habitat & Behavior" container me dikhti hai */
+    $habImg  = $mainImg !== '' ? $mainImg : (isset($gallery[0]) ? $gallery[0]['src'] : '');
+    /* Banner aur "Conservation & Threats": apni images (assets/images/static/ se) */
+    $slug      = preg_replace('/[^A-Za-z0-9_-]/', '', ad_f($animal, 'slug'));
+    $bannerImg = ad_static('animaldetail-banner', $slug);       // animaldetail-banner.webp (ya animaldetail-banner-{slug}.webp)
+    if ($bannerImg === '') $bannerImg = ad_static('animal-detail', $slug);          // animal-detail.webp
+    if ($bannerImg === '') $bannerImg = ad_static('animal-details-banner', $slug);  // purana naam (fallback)
+    $consImg   = ad_static('animal-details-conservation', $slug);  // animal-details-conservation.webp
     $showHab = ($habText !== '' || count($behItems) > 0);
 }
 
@@ -303,7 +335,7 @@ require '../includes/header.php';
   --sw-orange: #E8A15B;
   --sw-forest: #173B2A;
   --sw-dark:   #0B2F22;
-  --sw-gold:   #C89B3C;
+  --sw-gold:   #E8A15B;
   --sw-text:   #2B241D;
   background: var(--sw-white);
   color: var(--sw-text);
@@ -334,7 +366,7 @@ require '../includes/header.php';
   font-size: clamp(1.15rem, 1.7vw, 1.4rem); font-weight: 700; line-height: 1.15; color: var(--sw-forest);
 }
 .ad-h2 > svg { width: 24px; height: 24px; flex: 0 0 auto; fill: none; stroke: var(--sw-gold); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.ad-h2::after { content: ""; width: 44px; height: 2px; background: linear-gradient(90deg, var(--sw-gold), rgba(200,155,60,0)); }
+.ad-h2::after { content: ""; width: 44px; height: 2px; background: linear-gradient(90deg, var(--sw-gold), rgba(232,161,91,0)); }
 .ad-sub { margin: -6px 0 0 34px; font-size: .82rem; color: var(--sw-text); opacity: .8; }
 .ad-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
 .ad-head .ad-h2 { margin-bottom: 10px; }
@@ -414,7 +446,7 @@ require '../includes/header.php';
 
 .ad-facts {
   position: relative; padding: 16px 22px 8px;
-  background: var(--sw-white); border: 1px solid rgba(200,155,60,.4); border-radius: 14px;
+  background: var(--sw-white); border: 1px solid rgba(232,161,91,.4); border-radius: 14px;
   box-shadow: 0 8px 24px rgba(23,59,42,.12);
 }
 .ad-facts .ad-h2 { margin-bottom: 6px; }
@@ -499,7 +531,7 @@ require '../includes/header.php';
 .ad-related { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .ad-rel {
   position: relative; display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; text-decoration: none; color: var(--sw-forest);
-  background: var(--sw-white); border: 1px solid rgba(200,155,60,.4); border-radius: 12px; box-shadow: 0 6px 18px rgba(23,59,42,.1);
+  background: var(--sw-white); border: 1px solid rgba(232,161,91,.4); border-radius: 12px; box-shadow: 0 6px 18px rgba(23,59,42,.1);
   transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
 .ad-rel:hover { transform: translateY(-3px); border-color: var(--sw-gold); box-shadow: 0 12px 26px rgba(23,59,42,.18); }
@@ -563,7 +595,7 @@ require '../includes/header.php';
 .ad-funfact span { font-size: .88rem; line-height: 1.6; }
 
 .ad-side { display: grid; gap: 18px; }
-.ad-mini { padding: 16px 22px 10px; background: var(--sw-white); border: 1px solid rgba(200,155,60,.4); border-radius: 14px; box-shadow: 0 8px 24px rgba(23,59,42,.1); }
+.ad-mini { padding: 16px 22px 10px; background: var(--sw-white); border: 1px solid rgba(232,161,91,.4); border-radius: 14px; box-shadow: 0 8px 24px rgba(23,59,42,.1); }
 .ad-mini .ad-h2 { margin-bottom: 6px; font-size: 1.05rem; }
 .ad-mini-row { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(23,59,42,.12); font-size: .84rem; }
 .ad-mini-row:last-child { border-bottom: 0; }
@@ -574,15 +606,15 @@ require '../includes/header.php';
 .ad-link-btn { background: none; border: 0; cursor: pointer; font-family: inherit; }
 
 .ad-moregrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.ad-more-card { padding: 22px 24px; background: var(--sw-white); border: 1px solid rgba(200,155,60,.4); border-top: 3px solid var(--sw-gold); border-radius: 14px; box-shadow: 0 8px 24px rgba(23,59,42,.1); }
+.ad-more-card { padding: 22px 24px; background: var(--sw-white); border: 1px solid rgba(232,161,91,.4); border-top: 3px solid var(--sw-gold); border-radius: 14px; box-shadow: 0 8px 24px rgba(23,59,42,.1); }
 .ad-more-card .ad-h2 { font-size: 1.1rem; margin-bottom: 10px; }
 
 .ad-faq-band { background: var(--sw-forest); color: var(--sw-white); padding: clamp(32px, 4.5vw, 56px) 0; }
 .ad-faq-band .ad-h2 { color: var(--sw-white); }
 .ad-faq-band .ad-h2 > svg { stroke: var(--sw-orange); }
 .ad-faq-band .ad-h2::after { background: linear-gradient(90deg, var(--sw-orange), rgba(232,161,91,0)); }
-.ad-faq-list { max-width: 900px; border-top: 1px solid rgba(200,155,60,.35); }
-.ad-faq-item { border-bottom: 1px solid rgba(200,155,60,.35); }
+.ad-faq-list { max-width: 900px; border-top: 1px solid rgba(232,161,91,.35); }
+.ad-faq-item { border-bottom: 1px solid rgba(232,161,91,.35); }
 .ad-faq-item summary {
   display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 4px; cursor: pointer; list-style: none;
   font-size: .98rem; font-weight: 700; line-height: 1.35;
@@ -620,13 +652,15 @@ require '../includes/header.php';
 
 .ad-hab-grid {
   gap: 0; align-items: stretch; overflow: hidden;
-  background: #F4F1E4; border: 1px solid rgba(200,155,60,.4); border-radius: 18px;
+  background: #F4F1E4; border: 1px solid rgba(232,161,91,.4); border-radius: 18px;
   box-shadow: 0 8px 24px rgba(23,59,42,.1);
 }
-.ad-hab-visual { position: relative; min-height: 280px; }
-.ad-paper { position: absolute; inset: 0; padding: 0; }
+.ad-hab-visual { position: relative; min-height: 0; }
+.ad-paper { position: relative; inset: auto; padding: 0; }
 .ad-paper::before { display: none; }
-.ad-hab-grid .ad-pic { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
+/* Image poori dikhti hai (crop nahi): card ki height image ke ratio se set hoti hai */
+.ad-hab-grid .ad-pic { position: relative; inset: auto; aspect-ratio: auto; border-radius: 0; box-shadow: none; line-height: 0; background: #F4F1E4; }
+.ad-hab-grid .ad-pic img { position: static; display: block; width: 100%; height: auto; object-fit: contain; }
 .ad-hab-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(22px, 3vw, 44px); }
 .ad-hab-copy > .ad-rich { margin-bottom: 16px; }
 .ad-hab-copy .ad-sprig { right: 14px; bottom: 6px; width: 46px; height: 68px; opacity: .5; }
@@ -637,12 +671,24 @@ require '../includes/header.php';
 .ad-chip b::after { content: ":"; }
 @media (max-width: 900px) {
   .ad-gallery.is-few a, .ad-gallery.is-mid a { aspect-ratio: 4 / 3; }
-  .ad-hab-visual { min-height: 220px; }
+  .ad-hab-visual { min-height: 0; }
 }
 
 /* ---------- banner: image only, no text on top ---------- */
+/* ---- Banner (apni image): poori image dikhti hai, height image ke ratio ke hisaab se apne aap set hoti hai (crop nahi, khali jagah nahi) ---- */
 .ad-hero::before { display: none; }
-.ad-hero { min-height: clamp(300px, 30vw, 460px); }
+.ad-hero { display: block; position: relative; min-height: 0; line-height: 0; overflow: hidden; }
+.ad-hero.no-img { min-height: clamp(220px, 30vw, 360px); }
+/* Banner: container image ke exact size ka. Upar-neeche ya side me koi gap nahi, poori image dikhti hai */
+.ad-hero:not(.no-img) { height: auto; min-height: 0; aspect-ratio: auto; background: none; }
+.ad-hero:not(.no-img)::before { display: none; content: none; }
+.ad-hero-img { position: static; inset: auto; display: block; width: 100%; height: auto; max-width: 100%; object-fit: fill; }
+/* ---------- Content justify: description, habitat, conservation, more-about, FAQ ---------- */
+.ad-rich, .ad-rich p, .ad-rich li, .ad-cons-copy .ad-rich p { text-align: justify; text-justify: inter-word; }
+/* Habitat & Range (mini card) justify nahi hoga */
+.ad-mini, .ad-mini-row, .ad-mini-row b, .ad-mini-row span { text-align: left; text-justify: auto; }
+/* Native range / region wala content justify nahi hoga (left aligned) */
+.ad-more-card.is-range .ad-rich, .ad-more-card.is-range .ad-rich p, .ad-more-card.is-range .ad-rich li { text-align: left; }
 .ad-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 </style>
 
@@ -664,9 +710,9 @@ require '../includes/header.php';
 <main class="ad-page">
 
   <!-- ============ HERO ============ -->
-  <section class="ad-hero">
-    <?php if ($mainImg !== ''): ?>
-      <img class="ad-hero-img" src="<?= ad_e($mainImg) ?>" alt="<?= ad_e($name) ?>" onerror="this.style.display='none'">
+  <section class="ad-hero<?= $bannerImg === '' ? ' no-img' : '' ?>"<?= $bannerImg !== '' ? ' style="--bn:url(\'' . ad_e($bannerImg) . '\')"' : '' ?>>
+    <?php if ($bannerImg !== ''): ?>
+      <img class="ad-hero-img" src="<?= ad_e($bannerImg) ?>" alt="<?= ad_e($name) ?>" onerror="this.style.display='none'">
     <?php endif; ?>
 
     <h1 class="ad-sr"><?= ad_e($name) ?></h1>
@@ -735,29 +781,6 @@ require '../includes/header.php';
     </div>
   </section>
 
-  <!-- ============ GALLERY ============ -->
-  <?php if (count($gallery) > 0): $shown = array_slice($gallery, 0, 5); $extra = count($gallery) - count($shown); ?>
-  <section class="ad-sec" id="gallery">
-    <div class="ad-wrap">
-      <div class="ad-head">
-        <div>
-          <h2 class="ad-h2"><?= ad_icon('image') ?>Gallery</h2>
-          <p class="ad-sub">A glimpse into the life of the <?= ad_e($name) ?></p>
-        </div>
-        <button type="button" class="ad-link ad-link-btn" data-lb="0">View All Photos &rarr;</button>
-      </div>
-      <div class="ad-gallery <?= count($shown) <= 2 ? 'is-few' : (count($shown) <= 4 ? 'is-mid' : '') ?>" style="--n:<?= count($shown) ?>">
-        <?php foreach ($shown as $i => $g): ?>
-          <a href="<?= ad_e($g['src']) ?>" data-lb="<?= $i ?>" aria-label="Open photo <?= $i + 1 ?>">
-            <img src="<?= ad_e($g['src']) ?>" alt="<?= ad_e($g['alt']) ?>" loading="lazy" onerror="this.style.display='none'">
-            <?php if ($i === count($shown) - 1 && $extra > 0): ?><span class="ad-plus">+<?= (int)$extra ?></span><?php endif; ?>
-          </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </section>
-  <?php endif; ?>
-
   <!-- ============ HABITAT & BEHAVIOR ============ -->
   <?php if ($showHab): ?>
   <section class="ad-sec">
@@ -801,29 +824,6 @@ require '../includes/header.php';
   </section>
   <?php endif; ?>
 
-  <!-- ============ CONSERVATION & THREATS ============ -->
-  <?php if ($consText !== ''): ?>
-  <section class="ad-sec">
-    <div class="ad-wrap">
-      <div class="ad-cons">
-        <div class="ad-cons-copy">
-          <span class="ad-cons-ico"><?= ad_icon('leaf') ?></span>
-          <div>
-            <h2 class="ad-h2">Conservation &amp; Threats</h2>
-            <div class="ad-rich"><?= ad_rich($consText) ?></div>
-            <a href="conservation.php" class="ad-btn is-outline">Learn How You Can Help &rarr;</a>
-          </div>
-        </div>
-        <div class="ad-cons-pic">
-          <?php if ($consImg !== ''): ?>
-            <img src="<?= ad_e($consImg) ?>" alt="<?= ad_e($name) ?> conservation" loading="lazy" onerror="this.style.display='none'">
-          <?php endif; ?>
-          <div class="ad-cons-quote"><span>Their future<br>is in our hands.</span><?= ad_icon('paw') ?></div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <?php endif; ?>
 
   <!-- ============ MORE ABOUT (other long admin fields) ============ -->
   <?php if (count($moreBlocks) > 0): ?>
@@ -832,7 +832,7 @@ require '../includes/header.php';
       <h2 class="ad-h2"><?= ad_icon('paw') ?>More About <?= ad_e($name) ?></h2>
       <div class="ad-moregrid">
         <?php foreach ($moreBlocks as $b): ?>
-          <article class="ad-more-card">
+          <article class="ad-more-card<?= preg_match('/range|native|region|countr|distribution|location|geograph/i', $b[0]) ? ' is-range' : '' ?>">
             <h3 class="ad-h2"><?= ad_e($b[1]) ?></h3>
             <div class="ad-rich"><?= ad_rich($b[2]) ?></div>
           </article>
@@ -885,42 +885,6 @@ require '../includes/header.php';
       </div>
     </div>
   </section>
-  <?php endif; ?>
-
-  <!-- photo viewer -->
-  <?php if (count($gallery) > 0): ?>
-  <div class="ad-lb" id="adLb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-    <button type="button" class="ad-lb-close" aria-label="Close">&times;</button>
-    <button type="button" class="ad-lb-prev" aria-label="Previous photo">&lsaquo;</button>
-    <img src="" alt="">
-    <button type="button" class="ad-lb-next" aria-label="Next photo">&rsaquo;</button>
-    <div class="ad-lb-count"></div>
-  </div>
-  <script>
-  (function () {
-    var imgs = <?= json_encode(array_column($gallery, 'src'), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
-    var alts = <?= json_encode(array_column($gallery, 'alt'), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
-    var box = document.getElementById('adLb');
-    if (!box || !imgs.length) return;
-    var im = box.querySelector('img'), count = box.querySelector('.ad-lb-count'), cur = 0;
-    function show(n) { cur = (n + imgs.length) % imgs.length; im.src = imgs[cur]; im.alt = alts[cur] || ''; count.textContent = (cur + 1) + ' / ' + imgs.length; }
-    function open(n) { show(n); box.hidden = false; document.body.style.overflow = 'hidden'; box.querySelector('.ad-lb-close').focus(); }
-    function close() { box.hidden = true; document.body.style.overflow = ''; }
-    [].forEach.call(document.querySelectorAll('[data-lb]'), function (el) {
-      el.addEventListener('click', function (e) { e.preventDefault(); open(parseInt(el.getAttribute('data-lb'), 10) || 0); });
-    });
-    box.querySelector('.ad-lb-close').addEventListener('click', close);
-    box.querySelector('.ad-lb-prev').addEventListener('click', function () { show(cur - 1); });
-    box.querySelector('.ad-lb-next').addEventListener('click', function () { show(cur + 1); });
-    box.addEventListener('click', function (e) { if (e.target === box) close(); });
-    document.addEventListener('keydown', function (e) {
-      if (box.hidden) return;
-      if (e.key === 'Escape') close();
-      if (e.key === 'ArrowLeft') show(cur - 1);
-      if (e.key === 'ArrowRight') show(cur + 1);
-    });
-  })();
-  </script>
   <?php endif; ?>
 
 </main>

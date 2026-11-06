@@ -60,34 +60,52 @@ class TicketBookingTest extends TestCase
         $this->assertDatabaseMissing('tickets', ['id' => $ticket->id]);
     }
 
-    public function test_booking_uses_database_price_and_successful_test_payment_issues_ticket(): void
+    public function test_booking_stays_pending_until_admin_verifies_the_submitted_payment_reference(): void
     {
-        $ticket = Ticket::create(['ticket_type' => 'Family', 'price' => 27.50, 'status' => 'active']);
+        $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 2.00, 'status' => 'active']);
         $submissionToken = (string) Str::uuid();
         $this->withSession(['booking_form_tokens' => [
             $submissionToken => now()->addMinutes((int) config('session.lifetime'))->timestamp,
         ]]);
 
-        $response = $this->post(route('bookings.store'), [
+        $response = $this->postJson(route('bookings.store'), [
             'submission_token' => $submissionToken,
             'ticket_id' => $ticket->id,
             'visit_date' => now()->addDay()->toDateString(),
-            'ticket_quantity' => 3,
+            'ticket_quantity' => 2,
             'visitor_name' => 'Visitor Example',
             'visitor_email' => 'visitor@example.test',
             'visitor_phone' => '+1 555 0100',
-            'price' => 0.01,
         ]);
 
-        $booking = Booking::firstOrFail();
-        $response->assertRedirect(route('bookings.payment', $booking));
-        $this->get(route('bookings.payment', $booking))->assertOk()->assertSee('Test payment');
-        $this->assertSame('27.50', $booking->unit_price);
-        $this->assertSame('82.50', $booking->total_amount);
+        $booking = Booking::query()->latest('id')->firstOrFail();
+        $response->assertCreated()->assertJsonPath('paymentUrl', route('bookings.payment.modal', $booking));
+        $this->get(route('bookings.payment.modal', $booking))
+            ->assertOk()
+            ->assertSee('Amount to pay: ₹4.00')
+            ->assertSee('UTR / transaction ID');
+        $this->assertSame('2.00', $booking->unit_price);
+        $this->assertSame('4.00', $booking->total_amount);
         $this->assertSame('pending', $booking->payment_status);
 
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success'])
-            ->assertRedirect(route('bookings.confirmation', $booking));
+        $this->postJson(route('bookings.payment.process', $booking), ['payment_reference' => 'UTR123456'])
+            ->assertOk()
+            ->assertJsonPath('confirmationUrl', route('bookings.confirmation.modal', $booking));
+
+        $booking->refresh();
+        $this->assertSame('UTR123456', $booking->payment_reference);
+        $this->assertSame('pending', $booking->payment_status);
+        $this->assertSame('pending', $booking->booking_status);
+        $this->assertNull($booking->ticket_number);
+        $this->assertNull($booking->verification_token);
+        $this->get(route('bookings.confirmation.modal', $booking))
+            ->assertOk()
+            ->assertSee('Payment verification pending')
+            ->assertSee('not confirmed');
+
+        $this->actingAs(User::factory()->create(), 'web')
+            ->post(route('admin.bookings.verify-payment', $booking))
+            ->assertRedirect(route('admin.bookings.show', $booking));
 
         $booking->refresh();
         $this->assertSame('paid', $booking->payment_status);
@@ -96,22 +114,79 @@ class TicketBookingTest extends TestCase
         $this->assertNotNull($booking->verification_token);
         $this->get(route('bookings.confirmation', $booking))
             ->assertOk()
-            ->assertSee('Your test booking is confirmed')
+            ->assertSee('Your booking is confirmed')
             ->assertSee('Download PDF ticket');
+        $this->get(route('bookings.confirmation.modal', $booking))
+            ->assertOk()
+            ->assertSee('Unique ticket verification QR code');
 
         $this->get(route('bookings.ticket.download', $booking))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');
     }
 
+    public function test_booking_modal_uses_the_selected_ticket_and_inr_price(): void
+    {
+        $tickets = [
+            Ticket::create(['ticket_type' => 'Adult', 'price' => 2, 'status' => 'active']),
+            Ticket::create(['ticket_type' => 'Child', 'price' => 1, 'status' => 'active']),
+            Ticket::create(['ticket_type' => 'Family Pass', 'price' => 3, 'status' => 'active']),
+        ];
+
+        foreach ($tickets as $ticket) {
+            $this->get(route('bookings.modal', $ticket))
+                ->assertOk()
+                ->assertSee('Book '.$ticket->ticket_type.' tickets')
+                ->assertSee(number_format($ticket->price, 2, '.', ''))
+                ->assertDontSee('$');
+        }
+    }
+
+    public function test_booking_and_payment_fields_are_validated_and_transaction_references_cannot_be_reused(): void
+    {
+        $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 2, 'status' => 'active']);
+        $submissionToken = (string) Str::uuid();
+        $this->withSession(['booking_form_tokens' => [
+            $submissionToken => now()->addMinutes((int) config('session.lifetime'))->timestamp,
+        ]]);
+
+        $this->postJson(route('bookings.store'), [
+            'submission_token' => $submissionToken,
+            'ticket_id' => $ticket->id,
+            'visit_date' => now()->subDay()->toDateString(),
+            'ticket_quantity' => 21,
+            'visitor_name' => '',
+            'visitor_email' => 'invalid',
+            'visitor_phone' => '',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'visit_date',
+                'ticket_quantity',
+                'visitor_name',
+                'visitor_email',
+                'visitor_phone',
+            ]);
+
+        $firstBooking = $this->createVisitorBooking();
+        $secondBooking = $this->createVisitorBooking();
+        $this->postJson(route('bookings.payment.process', $secondBooking), [
+            'payment_reference' => $firstBooking->payment_reference,
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('payment_reference');
+
+        $this->postJson(route('bookings.payment.process', $secondBooking), [])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('payment_reference');
+    }
+
     public function test_booking_form_tokens_remain_valid_across_more_than_ten_open_forms(): void
     {
         $ticket = Ticket::create(['ticket_type' => 'Adult', 'price' => 15, 'status' => 'active']);
-        $firstForm = $this->get(route('bookings.create', $ticket))->assertOk();
+        $firstForm = $this->get(route('bookings.modal', $ticket))->assertOk();
         $firstToken = $firstForm->viewData('submissionToken');
 
         for ($i = 0; $i < 12; $i++) {
-            $this->get(route('bookings.create', $ticket))->assertOk();
+            $this->get(route('bookings.modal', $ticket))->assertOk();
         }
 
         $response = $this->post(route('bookings.store'), [
@@ -164,24 +239,19 @@ class TicketBookingTest extends TestCase
             ]);
     }
 
-    public function test_failed_payment_never_issues_ticket_and_cannot_be_replayed_as_success(): void
+    public function test_submitting_a_transaction_reference_does_not_fake_payment_success(): void
     {
         $booking = $this->createVisitorBooking();
 
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'failure'])
-            ->assertRedirect(route('bookings.confirmation', $booking));
-        $this->get(route('bookings.confirmation', $booking))
-            ->assertOk()
-            ->assertSee('Test payment was not successful')
-            ->assertSee('Start a new booking to retry');
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success'])
-            ->assertRedirect(route('bookings.confirmation', $booking));
-
-        $booking->refresh();
-        $this->assertSame('failed', $booking->payment_status);
-        $this->assertSame('failed', $booking->booking_status);
+        $this->assertSame('pending', $booking->payment_status);
+        $this->assertSame('pending', $booking->booking_status);
+        $this->assertNotNull($booking->payment_reference);
         $this->assertNull($booking->ticket_number);
         $this->assertNull($booking->verification_token);
+        $this->get(route('bookings.confirmation', $booking))
+            ->assertOk()
+            ->assertSee('Payment verification pending')
+            ->assertSee('has not yet been verified');
         $this->get(route('bookings.ticket.download', $booking))->assertNotFound();
     }
 
@@ -213,22 +283,16 @@ class TicketBookingTest extends TestCase
         ]);
     }
 
-    public function test_cancelled_booking_has_no_confirmed_ticket_and_private_booking_requires_its_session(): void
+    public function test_pending_booking_has_no_ticket_and_private_booking_requires_its_session(): void
     {
         $booking = $this->createVisitorBooking();
 
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'cancel']);
-        $booking->refresh();
-        $this->assertSame('cancelled', $booking->payment_status);
+        $this->assertSame('pending', $booking->payment_status);
         $this->assertNull($booking->ticket_number);
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success'])
-            ->assertRedirect(route('bookings.confirmation', $booking));
-        $booking->refresh();
-        $this->assertSame('cancelled', $booking->payment_status);
         $this->get(route('bookings.confirmation', $booking))
             ->assertOk()
-            ->assertSee('No payment was made')
-            ->assertSee('Choose tickets');
+            ->assertSee('has not yet been verified');
+        $this->get(route('bookings.ticket.download', $booking))->assertNotFound();
 
         $this->withSession(['booking_access' => []])
             ->get(route('bookings.confirmation', $booking))
@@ -238,7 +302,8 @@ class TicketBookingTest extends TestCase
     public function test_verification_does_not_expose_visitor_contact_details_and_ticket_deletion_is_blocked(): void
     {
         $booking = $this->createVisitorBooking();
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success']);
+        $this->actingAs(User::factory()->create(), 'web')
+            ->post(route('admin.bookings.verify-payment', $booking));
         $booking->refresh();
 
         $this->get(route('tickets.verify', $booking->verification_token))
@@ -275,7 +340,8 @@ class TicketBookingTest extends TestCase
     public function test_admin_can_view_qr_download_ticket_and_cancel_a_confirmed_booking(): void
     {
         $booking = $this->createVisitorBooking();
-        $this->post(route('bookings.payment.process', $booking), ['test_outcome' => 'success']);
+        $this->actingAs(User::factory()->create(), 'web')
+            ->post(route('admin.bookings.verify-payment', $booking));
         $booking->refresh();
         $admin = User::factory()->create();
 
@@ -283,6 +349,8 @@ class TicketBookingTest extends TestCase
             ->get(route('admin.bookings.show', $booking))
             ->assertOk()
             ->assertSee($booking->visitor_email)
+            ->assertSee($booking->visitor_phone)
+            ->assertSee($booking->payment_reference)
             ->assertSee('Ticket verification QR code');
 
         $this->get(route('admin.bookings.ticket', $booking))
@@ -318,6 +386,11 @@ class TicketBookingTest extends TestCase
             'visitor_phone' => '+1 555 0100',
         ]);
 
-        return Booking::firstOrFail();
+        $booking = Booking::query()->latest('id')->firstOrFail();
+        $this->post(route('bookings.payment.process', $booking), [
+            'payment_reference' => 'UTR'.Str::upper(Str::random(12)),
+        ]);
+
+        return $booking->fresh();
     }
 }

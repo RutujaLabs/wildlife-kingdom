@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Services\TicketDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AdminBookingController extends Controller
@@ -52,6 +53,33 @@ class AdminBookingController extends Controller
             : null;
 
         return view('admin.bookings.show', compact('booking', 'qrDataUri'));
+    }
+
+    public function verifyPayment(Booking $booking)
+    {
+        DB::transaction(function () use ($booking) {
+            $lockedBooking = Booking::query()->lockForUpdate()->findOrFail($booking->getKey());
+
+            if (! $lockedBooking->payment_reference
+                || $lockedBooking->payment_status !== 'pending'
+                || $lockedBooking->booking_status !== 'pending') {
+                throw ValidationException::withMessages([
+                    'payment_reference' => 'Only pending bookings with a submitted transaction reference can be verified.',
+                ]);
+            }
+
+            $lockedBooking->forceFill([
+                'payment_status' => 'paid',
+                'booking_status' => 'confirmed',
+                'ticket_number' => 'WK-T-'.Str::upper(Str::random(12)),
+                'verification_token' => (string) Str::uuid(),
+                'paid_at' => now(),
+            ])->save();
+        });
+
+        return redirect()
+            ->route('admin.bookings.show', $booking)
+            ->with('success', 'Payment verified and booking confirmed.');
     }
 
     public function updateStatus(Request $request, Booking $booking)

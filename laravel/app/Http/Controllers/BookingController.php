@@ -26,10 +26,18 @@ class BookingController extends Controller
     {
         abort_unless($ticket->status === 'active', 404);
 
-        $tickets = Ticket::query()
-            ->where('status', 'active')
-            ->orderBy('price')
-            ->get();
+        $baseUrl = request()->getBaseUrl();
+        $siteRoot = $baseUrl !== ''
+            ? rtrim(dirname(dirname($baseUrl)), '/')
+            : '';
+
+        return redirect()->to($siteRoot.'/public_html/tickets.php?book='.$ticket->getKey());
+    }
+
+    public function bookingModal(Ticket $ticket)
+    {
+        abort_unless($ticket->status === 'active', 404);
+
         $submissionToken = (string) Str::uuid();
         $formTokens = session()->get('booking_form_tokens', []);
         $now = now()->timestamp;
@@ -39,7 +47,7 @@ class BookingController extends Controller
         $formTokens[$submissionToken] = now()->addMinutes((int) config('session.lifetime', 120))->timestamp;
         session()->put('booking_form_tokens', $formTokens);
 
-        return view('front.bookings.create', compact('ticket', 'tickets', 'submissionToken'));
+        return view('front.bookings.modal', compact('ticket', 'submissionToken'));
     }
 
     public function store(Request $request)
@@ -55,6 +63,12 @@ class BookingController extends Controller
 
         if ($existingBooking) {
             $this->grantVisitorAccess($existingBooking);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'paymentUrl' => route('bookings.payment.modal', $existingBooking),
+                ]);
+            }
 
             return $this->bookingRedirect($existingBooking);
         }
@@ -112,6 +126,12 @@ class BookingController extends Controller
 
         $this->grantVisitorAccess($booking);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'paymentUrl' => route('bookings.payment.modal', $booking),
+            ], 201);
+        }
+
         return $this->bookingRedirect($booking);
     }
 
@@ -126,39 +146,45 @@ class BookingController extends Controller
         return view('front.bookings.payment', compact('booking'));
     }
 
+    public function paymentModal(Booking $booking)
+    {
+        $this->authorizeVisitor($booking);
+        $booking->load('ticket');
+
+        return view('front.bookings.payment-modal', compact('booking'));
+    }
+
     public function processPayment(Request $request, Booking $booking)
     {
         $this->authorizeVisitor($booking);
 
         $validated = $request->validate([
-            'test_outcome' => ['required', 'in:success,failure,cancel'],
+            'payment_reference' => [
+                'required',
+                'string',
+                'max:100',
+                \Illuminate\Validation\Rule::unique('bookings', 'payment_reference')->ignore($booking->getKey()),
+            ],
         ]);
 
         DB::transaction(function () use ($booking, $validated) {
             $lockedBooking = Booking::query()->lockForUpdate()->findOrFail($booking->getKey());
 
             if ($lockedBooking->payment_status !== 'pending' || $lockedBooking->booking_status !== 'pending') {
-                return;
+                throw ValidationException::withMessages([
+                    'payment_reference' => 'This booking is no longer awaiting payment verification.',
+                ]);
             }
 
-            if ($validated['test_outcome'] === 'success') {
-                $lockedBooking->forceFill([
-                    'payment_status' => 'paid',
-                    'booking_status' => 'confirmed',
-                    'ticket_number' => 'WK-T-'.Str::upper(Str::random(12)),
-                    'verification_token' => (string) Str::uuid(),
-                    'paid_at' => now(),
-                ])->save();
-
-                return;
-            }
-
-            $cancelled = $validated['test_outcome'] === 'cancel';
-            $lockedBooking->forceFill([
-                'payment_status' => $cancelled ? 'cancelled' : 'failed',
-                'booking_status' => $cancelled ? 'cancelled' : 'failed',
-            ])->save();
+            $lockedBooking->payment_reference = trim($validated['payment_reference']);
+            $lockedBooking->save();
         });
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'confirmationUrl' => route('bookings.confirmation.modal', $booking),
+            ]);
+        }
 
         return redirect()->route('bookings.confirmation', $booking);
     }
@@ -169,6 +195,17 @@ class BookingController extends Controller
         $booking->load('ticket');
 
         return view('front.bookings.confirmation', compact('booking'));
+    }
+
+    public function confirmationModal(Booking $booking, TicketDocument $ticketDocument)
+    {
+        $this->authorizeVisitor($booking);
+        $booking->load('ticket');
+        $qrDataUri = $booking->payment_status === 'paid' && $booking->booking_status === 'confirmed'
+            ? $ticketDocument->qrDataUri($booking)
+            : null;
+
+        return view('front.bookings.confirmation-modal', compact('booking', 'qrDataUri'));
     }
 
     public function downloadTicket(Booking $booking, TicketDocument $ticketDocument)

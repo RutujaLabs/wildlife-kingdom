@@ -21,6 +21,7 @@ class Booking extends Model
         'ticket_quantity',
         'unit_price',
         'total_amount',
+        'payment_reference',
         'payment_status',
         'booking_status',
         'ticket_number',

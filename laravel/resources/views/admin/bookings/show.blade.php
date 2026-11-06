@@ -21,16 +21,24 @@
         <p><strong>Visit date:</strong> {{ $booking->visit_date->format('F j, Y') }}</p>
         <p><strong>Ticket type:</strong> {{ $booking->ticket->ticket_type }}</p>
         <p><strong>Number of tickets:</strong> {{ $booking->ticket_quantity }}</p>
-        <p><strong>Unit price at booking:</strong> ${{ number_format($booking->unit_price, 2) }}</p>
-        <p><strong>Total amount:</strong> ${{ number_format($booking->total_amount, 2) }}</p>
-        <p><strong>Payment status:</strong> {{ ucfirst($booking->payment_status) }} (test mode)</p>
+        <p><strong>Unit price at booking:</strong> ₹{{ number_format($booking->unit_price, 2) }}</p>
+        <p><strong>Total amount:</strong> ₹{{ number_format($booking->total_amount, 2) }}</p>
+        <p><strong>Transaction / UTR ID:</strong> {{ $booking->payment_reference ?: 'Not submitted' }}</p>
+        <p><strong>Payment status:</strong> {{ ucfirst($booking->payment_status) }}</p>
         <p><strong>Booking status:</strong> {{ ucfirst($booking->booking_status) }}</p>
         <p><strong>Created:</strong> {{ $booking->created_at->format('F j, Y g:i A') }}</p>
-        @if($booking->paid_at)<p><strong>Test payment verified:</strong> {{ $booking->paid_at->format('F j, Y g:i A') }}</p>@endif
+        @if($booking->paid_at)<p><strong>Payment verified:</strong> {{ $booking->paid_at->format('F j, Y g:i A') }}</p>@endif
     </section>
 
     <section class="panel">
         <h3 style="margin-top:0;">Booking actions</h3>
+        @if($booking->payment_status === 'pending' && $booking->booking_status === 'pending' && $booking->payment_reference)
+            <p>Verify the transaction against your payment provider before confirming this booking.</p>
+            <form method="POST" action="{{ route('admin.bookings.verify-payment', $booking) }}" style="margin:16px 0;">
+                @csrf
+                <button class="btn btn-primary" type="submit" onclick="return confirm('Have you verified this payment with your payment provider?')">Verify payment and confirm booking</button>
+            </form>
+        @endif
         @if($booking->payment_status === 'paid' && $booking->booking_status === 'confirmed')
             <p><strong>Ticket number:</strong> {{ $booking->ticket_number }}</p>
             <a class="btn btn-primary" href="{{ route('admin.bookings.ticket', $booking) }}">Download PDF ticket</a>

@@ -106,9 +106,9 @@ class AdminUserSeeder extends Seeder
         }
 
         if (Ticket::count() === 0) {
-            Ticket::create(['ticket_type' => 'Adult', 'price' => 24.00, 'description' => 'Entry for adult visitors', 'status' => 'active']);
-            Ticket::create(['ticket_type' => 'Child', 'price' => 16.00, 'description' => 'Entry for children aged 3-12', 'status' => 'active']);
-            Ticket::create(['ticket_type' => 'Family Pass', 'price' => 60.00, 'description' => 'Two adults and up to three children', 'status' => 'active']);
+            Ticket::create(['ticket_type' => 'Adult', 'price' => 2.00, 'description' => 'Entry for adult visitors', 'status' => 'active']);
+            Ticket::create(['ticket_type' => 'Child', 'price' => 1.00, 'description' => 'Entry for children aged 3-12', 'status' => 'active']);
+            Ticket::create(['ticket_type' => 'Family Pass', 'price' => 3.00, 'description' => 'Two adults and up to three children', 'status' => 'active']);
         }
 
         if (Enquiry::count() === 0) {

@@ -214,8 +214,7 @@
     $factInputs = ['diet' => 'Diet', 'lifespan' => 'Lifespan', 'average_weight' => 'Average weight', 'average_height_length' => 'Average height / length', 'speed' => 'Speed'];
     $factAreas = [
         'behaviour' => 'Behaviour', 'reproduction' => 'Reproduction', 'ecological_role' => 'Ecological role',
-        'population_information' => 'Population information', 'major_threats' => 'Major threats',
-        'conservation_efforts' => 'Conservation efforts', 'fun_fact' => 'Fun fact',
+        'population_information' => 'Population information', 'fun_fact' => 'Fun fact',
     ];
     $imgFields = ['alt_text' => 'Alt text', 'caption' => 'Caption', 'credit' => 'Image credit', 'source' => 'Image source'];
 
@@ -546,7 +545,7 @@
                 @foreach($rangeAreas as $field => $label)
                     <div class="ae-f full">
                         <label class="ae-lbl" for="{{ $field }}">{{ $label }}</label>
-                        <textarea id="{{ $field }}" name="{{ $field }}" class="@error($field) is-invalid @enderror">{{ old($field, $animal->$field) }}</textarea>
+                        <textarea id="{{ $field }}" name="{{ $field }}" class="@error($field) is-invalid @enderror">{{ old($field, ltrim((string) $animal->$field, "> \t\r\n")) }}</textarea>
                         @error($field)<div class="ae-err">{{ $message }}</div>@enderror
                     </div>
                 @endforeach
@@ -577,7 +576,7 @@
                 @foreach($factAreas as $field => $label)
                     <div class="ae-f full">
                         <label class="ae-lbl" for="{{ $field }}">{{ $label }}</label>
-                        <textarea id="{{ $field }}" name="{{ $field }}" class="@error($field) is-invalid @enderror">{{ old($field, $animal->$field) }}</textarea>
+                        <textarea id="{{ $field }}" name="{{ $field }}" class="@error($field) is-invalid @enderror">{{ old($field, ltrim((string) $animal->$field, "> \t\r\n")) }}</textarea>
                         @error($field)<div class="ae-err">{{ $message }}</div>@enderror
                     </div>
                 @endforeach
@@ -1168,6 +1167,11 @@
     var saveBtns = $$('[data-save]');
     form.addEventListener('submit', function (e) {
         syncDesc();
+        /* long text fields ke shuru ka stray ">" hata do */
+        $$('.ae-pane textarea[name]').forEach(function (t) {
+            if (t.id === 'description' || t.name.indexOf('faqs') === 0 || t.name.indexOf('new_faqs') === 0) { return; }
+            t.value = t.value.replace(/^[\s\u00a0\u200b\ufeff>]+/, '');
+        });
         var bad = null;
         [['name', 'Please enter the animal name.'], ['category', 'Please choose a category.'], ['conservation_status', 'Please enter the conservation status.']].forEach(function (r) {
             var el = byId(r[0]);

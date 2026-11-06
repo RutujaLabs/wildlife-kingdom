@@ -2,6 +2,11 @@
 
 @section('title', 'Booking Status | Wildlife Kingdom')
 
+@php
+    $baseUrl = request()->getBaseUrl();
+    $siteRoot = $baseUrl !== '' ? rtrim(dirname(dirname($baseUrl)), '/') : '';
+@endphp
+
 @section('styles')
 <style>
     .wk-confirm { padding: 48px 0 64px; background: #f6f3ed; }
@@ -17,37 +22,40 @@
         <div class="wk-confirm-card">
             <span class="eyebrow">Booking update</span>
             <h1>
-                @if($booking->booking_status === 'confirmed')
-                    Your test booking is confirmed
-                @elseif($booking->booking_status === 'failed')
-                    Test payment was not successful
+                @if($booking->payment_status === 'paid' && $booking->booking_status === 'confirmed')
+                    Your booking is confirmed
                 @elseif($booking->booking_status === 'cancelled')
-                    Test booking cancelled
+                    Booking cancelled
                 @else
-                    Booking pending
+                    Payment verification pending
                 @endif
             </h1>
             <p class="wk-confirm-status">
-                <strong>TEST MODE:</strong> No real payment was made.
-                Payment: {{ ucfirst($booking->payment_status) }} · Booking: {{ ucfirst($booking->booking_status) }}
-            </p>
-            <p>Booking reference: <strong>{{ $booking->booking_reference }}</strong></p>
-            @if($booking->booking_status === 'confirmed')
-                <p>Your ticket number is <strong>{{ $booking->ticket_number }}</strong>.</p>
-                <a class="btn btn-gold" href="{{ route('bookings.ticket.download', $booking) }}">Download PDF ticket</a>
-            @elseif($booking->booking_status === 'failed')
-                <p>No confirmed ticket was issued. To retry, start a new booking; this failed payment cannot be retried from an old payment form.</p>
-                @if($booking->ticket && $booking->ticket->status === 'active')
-                    <a class="btn btn-gold" href="{{ route('bookings.create', $booking->ticket) }}">Start a new booking to retry</a>
+                @if($booking->payment_status === 'paid' && $booking->booking_status === 'confirmed')
+                    Payment verified · Booking confirmed
+                @elseif($booking->payment_reference)
+                    Transaction reference received. Payment has not yet been verified.
                 @else
-                    <a class="btn btn-gold" href="{{ route('front.tickets.index') }}">Choose another ticket to retry</a>
+                    No transaction reference has been submitted.
                 @endif
-            @elseif($booking->booking_status === 'cancelled')
-                <p>No payment was made and no ticket was issued. You can choose a ticket to start a new booking.</p>
-            @elseif($booking->booking_status === 'pending')
-                <a class="btn btn-gold" href="{{ route('bookings.payment', $booking) }}">Continue to test payment</a>
+            </p>
+            <p><strong>Booking ID:</strong> {{ $booking->booking_reference }}</p>
+            <p><strong>Visitor name:</strong> {{ $booking->visitor_name }}</p>
+            <p><strong>Email:</strong> {{ $booking->visitor_email }}</p>
+            <p><strong>Phone:</strong> {{ $booking->visitor_phone }}</p>
+            <p><strong>Ticket type:</strong> {{ $booking->ticket->ticket_type }}</p>
+            <p><strong>Visit date:</strong> {{ $booking->visit_date->format('F j, Y') }}</p>
+            <p><strong>Quantity:</strong> {{ $booking->ticket_quantity }}</p>
+            <p><strong>Total amount:</strong> ₹{{ number_format($booking->total_amount, 2) }}</p>
+            <p><strong>Payment status:</strong> {{ ucfirst($booking->payment_status) }}</p>
+            <p><strong>Booking status:</strong> {{ ucfirst($booking->booking_status) }}</p>
+            @if($booking->payment_status === 'paid' && $booking->booking_status === 'confirmed')
+                <p><strong>Ticket number:</strong> {{ $booking->ticket_number }}</p>
+                <a class="btn btn-gold" href="{{ route('bookings.ticket.download', $booking) }}">Download PDF ticket</a>
+            @elseif($booking->payment_reference)
+                <a class="btn btn-gold" href="{{ route('bookings.payment', $booking) }}">View payment status</a>
             @endif
-            <a class="btn btn-outline-dark" href="{{ route('front.tickets.index') }}" style="margin-left:8px;">Choose tickets</a>
+            <a class="btn btn-outline-dark" href="{{ $siteRoot }}/public_html/tickets.php" style="margin-left:8px;">Back to tickets</a>
         </div>
     </div>
 </section>

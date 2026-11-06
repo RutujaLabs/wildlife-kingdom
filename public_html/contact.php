@@ -45,12 +45,14 @@ require '../includes/header.php';
 .con-banner { position: relative; overflow: hidden; height: 500px; background-color: #0B2F22; }
 .con-banner::before {
   content: ""; position: absolute; inset: 0;
-  background: url('../assets/images/static/contact-banner.webp') center / cover no-repeat;
-  animation: conBannerPan 18s ease-in-out infinite alternate;
+  background: url('../assets/images/static/contacts-banner.webp') center center / 100% 100% no-repeat;
 }
 .con-banner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #e8b52a; }
-@keyframes conBannerPan { from { transform: scale(1); } to { transform: scale(1.08); } }
 @media (max-width: 800px) { .con-banner { height: 300px; } }
+/* MOBILE ONLY: banner image container ko poora bharti hai (koi khali jagah nahi, crop nahi, kam stretch). Desktop same rehta hai. */
+@media (max-width: 768px) {
+  .con-banner { height: auto; aspect-ratio: 5 / 2; }   /* 360px screen par ~144px; badhana ho to 5 / 2 ko 2 / 1 karo */
+}
 @media (prefers-reduced-motion: reduce) { .con-banner::before { animation: none !important; } }
 </style>
 

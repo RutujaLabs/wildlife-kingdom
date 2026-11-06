@@ -28,11 +28,14 @@ Route::get('/gallery', [FrontendController::class, 'gallery'])->name('gallery');
 
 Route::get('/tickets', [BookingController::class, 'tickets'])->name('front.tickets.index');
 Route::get('/tickets/verify/{verificationToken}', [BookingController::class, 'verify'])->name('tickets.verify');
+Route::get('/tickets/{ticket}/booking-modal', [BookingController::class, 'bookingModal'])->name('bookings.modal');
 Route::get('/tickets/{ticket}/book', [BookingController::class, 'create'])->name('bookings.create');
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
+Route::get('/bookings/{booking}/payment-modal', [BookingController::class, 'paymentModal'])->name('bookings.payment.modal');
 Route::post('/bookings/{booking}/payment', [BookingController::class, 'processPayment'])->name('bookings.payment.process');
 Route::get('/bookings/{booking}/confirmation', [BookingController::class, 'confirmation'])->name('bookings.confirmation');
+Route::get('/bookings/{booking}/confirmation-modal', [BookingController::class, 'confirmationModal'])->name('bookings.confirmation.modal');
 Route::get('/bookings/{booking}/ticket.pdf', [BookingController::class, 'downloadTicket'])->name('bookings.ticket.download');
 
 Route::prefix('admin')->group(function () {
@@ -48,6 +51,7 @@ Route::prefix('admin')->group(function () {
         Route::resource('tickets', TicketController::class)->except(['show']);
         Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/{booking}', [AdminBookingController::class, 'show'])->name('bookings.show');
+        Route::post('/bookings/{booking}/verify-payment', [AdminBookingController::class, 'verifyPayment'])->name('bookings.verify-payment');
         Route::patch('/bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.status');
         Route::get('/bookings/{booking}/ticket.pdf', [AdminBookingController::class, 'downloadTicket'])->name('bookings.ticket');
 

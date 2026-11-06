@@ -41,14 +41,23 @@ if (isset($pageCss)) {
 @media (max-width: 900px) {
   .main-nav.is-open { background: var(--wk-nav-green) !important; }
 }
-.site-header .header-cta,
-.site-header .header-cta.btn-gold {
+.site-header .header-cta.header-cta.header-cta,
+.site-header a.header-cta.btn,
+.site-header a.header-cta.btn-gold,
+.site-header .header-cta.header-cta:link,
+.site-header .header-cta.header-cta:visited,
+.site-header .header-cta.header-cta:hover,
+.site-header .header-cta.header-cta:focus,
+.site-header .header-cta.header-cta:active {
   background: #E8A15B !important;
   background-color: #E8A15B !important;
+  background-image: none !important;
   border-color: #E8A15B !important;
   color: #000 !important;
+  opacity: 1 !important;
+  filter: none !important;
 }
-.site-header .header-cta:hover { color: #000 !important; }
+.site-header .header-cta.header-cta:hover { transform: translateY(-1px); }
 
 /* Logo bada, upar-niche gap ke saath, navbar ki height same */
 .site-header .logo img {

@@ -449,6 +449,11 @@ $galBannerV    = is_file($galBannerFile) ? '?v=' . filemtime($galBannerFile) : '
   .ab-g1-lb { padding: 56px 10px 20px; }
   .ab-g1-lb .lb-p { left: 6px; } .ab-g1-lb .lb-n { right: 6px; }
 }
+/* MOBILE ONLY: banner image container ko poora bharti hai (koi khali jagah nahi, crop nahi). Desktop same rehta hai. */
+@media (max-width: 768px) {
+  .gal-banner { height: auto; aspect-ratio: 5 / 2; }   /* 360px screen par ~144px; badhana ho to 5 / 2 ko 2 / 1 karo */
+  .gal-banner::before { background-size: 100% 100%; background-position: center; }
+}
 @media (hover: none) { .ab-g1-badge { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .ab-g1 *, .ab-g1 *::before, .ab-g1 *::after, .gal-banner::before { animation: none !important; transition: none !important; }

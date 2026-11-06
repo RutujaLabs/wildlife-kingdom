@@ -355,6 +355,11 @@ foreach ($events as $e) {
 @media (max-width: 600px) {
   .ev-banner { height: 400px; }
 }
+/* MOBILE ONLY: image container ko poora bharti hai (koi khali jagah nahi, crop nahi). Desktop same rehta hai. */
+@media (max-width: 768px) {
+  .ev-banner { height: auto; aspect-ratio: 5 / 2; }   /* 360px screen par ~144px; badhana ho to 5 / 2 ko 2 / 1 karo */
+  .ev-banner-img { object-fit: fill; }
+}
 @media (max-width: 480px) {
   .ev-eyebrow { letter-spacing: .16em; font-size: .68rem; gap: 10px; }
   .ev-eyebrow::before { width: 26px; }

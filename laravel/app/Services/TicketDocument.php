@@ -45,10 +45,16 @@ class TicketDocument
         $options->setDefaultFont('DejaVu Sans');
         $options->setIsRemoteEnabled(false);
 
+        $logoPath = base_path('../assets/images/logo/wildlife-kingdom-header.jpg');
+        if (! is_file($logoPath)) {
+            throw new LogicException('The Wildlife Kingdom logo is required to generate a ticket PDF.');
+        }
+
         $pdf = new Dompdf($options);
         $pdf->loadHtml(view('front.bookings.ticket', [
             'booking' => $booking->loadMissing('ticket'),
             'qrDataUri' => $this->qrDataUri($booking),
+            'logoDataUri' => 'data:image/jpeg;base64,'.base64_encode(file_get_contents($logoPath)),
         ])->render());
         $pdf->setPaper('A4');
         $pdf->render();

@@ -64,6 +64,11 @@ require '../includes/header.php';
 /* ---------- banner (plain image) ---------- */
 .an-banner { position: relative; width: 100%; height: clamp(220px, 32vw, 520px); overflow: hidden; background: #0B2F22; }
 .an-banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+/* MOBILE ONLY: image container ko poora bharti hai (koi khali jagah nahi, crop nahi). Desktop same rehta hai. */
+@media (max-width: 768px) {
+  .an-banner { height: auto; aspect-ratio: 5 / 2; }   /* 360px screen par ~144px; badhana ho to 5 / 2 ko 2 / 1 karo */
+  .an-banner img { object-fit: fill; }
+}
 .an-leaf { position: absolute; pointer-events: none; }
 .an-leaf svg { width: 100%; height: 100%; }
 

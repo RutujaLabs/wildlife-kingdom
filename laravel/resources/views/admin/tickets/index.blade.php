@@ -26,7 +26,7 @@
                 @forelse($tickets as $ticket)
                     <tr>
                         <td>{{ $ticket->ticket_type }}</td>
-                        <td>${{ number_format($ticket->price, 2) }}</td>
+                        <td>₹{{ number_format($ticket->price, 2) }}</td>
                         <td>{{ $ticket->description ?: '—' }}</td>
                         <td>{{ ucfirst($ticket->status) }}</td>
                         <td>{{ $ticket->bookings_count }}</td>

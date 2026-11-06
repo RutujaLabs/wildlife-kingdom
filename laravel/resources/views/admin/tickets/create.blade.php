@@ -13,7 +13,7 @@
                 <input id="ticket_type" name="ticket_type" type="text" value="{{ old('ticket_type') }}" required>
             </div>
             <div class="field">
-                <label for="price">Price</label>
+                <label for="price">Price (₹ INR)</label>
                 <input id="price" name="price" type="number" step="0.01" min="0" value="{{ old('price', 0) }}" required>
             </div>
             <div class="field">

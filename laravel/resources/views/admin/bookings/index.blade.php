@@ -251,11 +251,11 @@
               @endphp
               <tr>
                 <td><a class="bk-ref" href="{{ route('admin.bookings.show', $booking) }}">{{ $booking->booking_reference ?: '#'.$booking->id }}</a></td>
-                <td>{{ $booking->visitor_name }}<br><span class="bk-visitor-email">{{ $booking->visitor_email }}</span></td>
+                <td>{{ $booking->visitor_name }}<br><span class="bk-visitor-email">{{ $booking->visitor_email }}</span><br><span class="bk-visitor-email">{{ $booking->visitor_phone }}</span></td>
                 <td>{{ $booking->visit_date->format('j M Y') }}</td>
                 <td>{{ $booking->ticket->ticket_type ?? '—' }}</td>
                 <td>{{ $booking->ticket_quantity }}</td>
-                <td>${{ number_format($booking->total_amount, 2) }}</td>
+                <td>₹{{ number_format($booking->total_amount, 2) }}</td>
                 <td>
                   <span class="bk-badge {{ $badge($pay) }}">
                     @if($pay === 'paid')

@@ -53,6 +53,11 @@ foreach (['habitats-banner.webp', 'habitats-banner.jpg', 'habitats-banner.jpeg',
 .hb-banner { position:relative; overflow:hidden; color:var(--sw-white); background:linear-gradient(135deg,#0B2F22 0%,#173B2A 55%,#2E5B44 100%); height:500px; }
 @media (max-width:560px) { .hb-banner { height:300px; } }
 .hb-banner-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+/* MOBILE ONLY: image container ko poora bharti hai (koi khali jagah nahi, crop nahi). Desktop same rehta hai. */
+@media (max-width:768px) {
+  .hb-banner { height:auto; aspect-ratio:5 / 2; }   /* 360px screen par ~144px; badhana ho to 5 / 2 ko 2 / 1 karo */
+  .hb-banner-photo { object-fit:fill; }
+}
 .hb-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 24px; border-radius:999px; font-weight:700; font-size:.9rem; text-decoration:none; border:2px solid transparent; transition:background .25s,color .25s,border-color .25s,transform .25s; }
 .hb-btn:hover { transform:translateY(-2px); }
 .hb-btn-gold { background:var(--sw-gold); color:var(--sw-forest); border-color:var(--sw-gold); }
