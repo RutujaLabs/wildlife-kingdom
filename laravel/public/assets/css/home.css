@@ -1,0 +1,140 @@
+/* ==========================================================
+   HOME PAGE SECTIONS
+   ========================================================== */
+
+.section { padding: 110px 0; }
+.section-light { background: var(--warm-ivory); color: var(--deep-charcoal); }
+.section-sand { background: var(--safari-sand); color: var(--deep-charcoal); }
+.section-dark { background: var(--forest-green); color: var(--warm-ivory); }
+.section-deepest { background: var(--deep-jungle); color: var(--warm-ivory); }
+
+.section-head { max-width: 620px; margin-bottom: 56px; }
+.section-head h2 { font-size: clamp(2rem, 4vw, 2.75rem); }
+.section-head p { margin-top: 14px; font-size: 1.05rem; opacity: .85; }
+
+/* ---------- Hero ---------- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  color: var(--warm-ivory);
+  padding-top: 80px;
+  background:
+    linear-gradient(180deg, rgba(11,42,26,0.55), rgba(11,42,26,0.88)),
+    var(--deep-jungle) url('../images/static/hero-bg.jpg') center/cover no-repeat;
+}
+.hero-inner { max-width: 720px; padding: 0 24px; margin: 0 auto; text-align: center; }
+.hero h1 { font-size: clamp(2.6rem, 6vw, 4.5rem); color: var(--warm-ivory); }
+.hero h1 span { color: var(--bright-gold); }
+.hero p { margin: 22px auto 36px; max-width: 52ch; font-size: 1.15rem; color: var(--safari-sand); }
+.hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.hero-fade { opacity: 0; transform: translateY(24px); animation: heroFade 1s ease forwards .2s; }
+@keyframes heroFade { to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .hero-fade { animation: none; opacity: 1; transform: none; } }
+
+/* ---------- Welcome / About ---------- */
+.welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.welcome-media { border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 5; background: var(--safari-sand); }
+.welcome-media img { width: 100%; height: 100%; object-fit: cover; }
+.welcome-text h2 { font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 20px; }
+.welcome-text p { margin-bottom: 16px; font-size: 1.05rem; color: rgba(23,26,22,.8); }
+.welcome-stats { display: flex; gap: 36px; margin-top: 32px; flex-wrap: wrap; }
+.welcome-stats strong { display: block; font-family: var(--font-display); font-size: 1.9rem; color: var(--royal-gold); }
+.welcome-stats span { font-size: .85rem; color: rgba(23,26,22,.7); }
+
+/* ---------- Explore Wildlife ---------- */
+.explore-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.explore-card {
+  background: rgba(244,233,200,.06);
+  border: 1px solid rgba(244,233,200,.15);
+  border-radius: 16px;
+  padding: 32px 24px;
+  transition: background .25s ease, transform .25s ease;
+}
+.explore-card:hover { background: rgba(244,233,200,.12); transform: translateY(-4px); }
+.explore-icon { font-size: 2.2rem; margin-bottom: 18px; }
+.explore-card h3 { font-size: 1.2rem; color: var(--warm-ivory); margin-bottom: 8px; }
+.explore-card p { font-size: .9rem; color: rgba(244,233,200,.75); }
+
+/* ---------- Habitats ---------- */
+.habitat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.habitat-card { position: relative; display: block; border-radius: 18px; overflow: hidden; aspect-ratio: 3 / 4; background: var(--forest-green); }
+.habitat-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.habitat-card:hover img { transform: scale(1.06); }
+.habitat-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(11,42,26,.9));
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 24px;
+}
+.habitat-overlay h3 { color: var(--warm-ivory); font-size: 1.4rem; }
+.habitat-overlay span { color: var(--bright-gold); font-size: .85rem; margin-top: 4px; display: block; }
+
+/* ---------- Featured Animals ---------- */
+.animal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.animal-card { background: rgba(244,233,200,.05); border: 1px solid rgba(244,233,200,.12); border-radius: 18px; overflow: hidden; }
+.animal-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--forest-green); }
+.animal-card-body { padding: 22px; }
+.animal-card-body .status {
+  display: inline-block; font-size: .72rem; padding: 4px 12px; border-radius: 999px;
+  background: rgba(217,154,22,.2); color: var(--bright-gold); margin-bottom: 10px;
+}
+.animal-card-body h3 { color: var(--warm-ivory); font-size: 1.3rem; margin-bottom: 6px; }
+.animal-card-body p { font-size: .85rem; color: rgba(244,233,200,.7); font-style: italic; }
+
+/* ---------- Conservation ---------- */
+.conservation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.conservation-media { border-radius: 18px; overflow: hidden; aspect-ratio: 1 / 1; background: var(--safari-sand); }
+.conservation-media img { width: 100%; height: 100%; object-fit: cover; }
+.conservation-text h2 { font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 20px; }
+.conservation-text p { font-size: 1.05rem; color: rgba(23,26,22,.8); }
+.conservation-list { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+.conservation-list div { display: flex; gap: 14px; align-items: flex-start; }
+.conservation-list .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--royal-gold); margin-top: 8px; flex-shrink: 0; }
+
+/* ---------- Upcoming Events ---------- */
+.event-list { display: flex; flex-direction: column; gap: 1px; background: rgba(244,233,200,.15); border-radius: 18px; overflow: hidden; }
+.event-row { display: flex; align-items: center; gap: 28px; padding: 28px; background: var(--forest-green); flex-wrap: wrap; }
+.event-date { font-family: var(--font-display); text-align: center; min-width: 80px; }
+.event-date strong { display: block; font-size: 2rem; color: var(--bright-gold); }
+.event-date span { font-size: .8rem; text-transform: uppercase; color: rgba(244,233,200,.7); }
+.event-info h3 { color: var(--warm-ivory); font-size: 1.25rem; margin-bottom: 6px; }
+.event-info p { font-size: .9rem; color: rgba(244,233,200,.7); }
+.event-row .btn { margin-left: auto; flex-shrink: 0; }
+
+/* ---------- Gallery ---------- */
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 180px; gap: 16px; }
+.gallery-grid a:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.gallery-grid img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; transition: transform .4s ease; background: var(--forest-green); }
+.gallery-grid a:hover img { transform: scale(1.04); }
+
+/* ---------- Visit Us ---------- */
+.visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+.visit-info h2 { font-size: clamp(2rem, 4vw, 2.75rem); margin-bottom: 12px; }
+.visit-info > p { color: rgba(244,233,200,.75); margin-bottom: 24px; }
+.visit-hours { display: flex; flex-direction: column; gap: 12px; margin: 20px 0 28px; }
+.visit-hours div { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(244,233,200,.15); padding-bottom: 10px; font-size: .95rem; }
+.visit-map {
+  border-radius: 18px; overflow: hidden; min-height: 360px;
+  background: rgba(244,233,200,.08);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(244,233,200,.5); font-size: .9rem;
+}
+
+/* ---------- Final CTA ---------- */
+.final-cta { background: linear-gradient(120deg, var(--royal-gold), var(--bright-gold)); color: var(--deep-jungle); text-align: center; padding: 100px 0; }
+.final-cta h2 { font-size: clamp(2.2rem, 5vw, 3.2rem); margin-bottom: 18px; }
+.final-cta p { max-width: 52ch; margin: 0 auto 32px; font-size: 1.1rem; opacity: .85; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  .welcome-grid, .conservation-grid, .visit-grid { grid-template-columns: 1fr; }
+  .explore-grid, .animal-grid, .habitat-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid a:nth-child(1) { grid-column: span 2; grid-row: span 1; }
+}
+@media (max-width: 600px) {
+  .section { padding: 72px 0; }
+  .explore-grid, .animal-grid, .habitat-grid { grid-template-columns: 1fr; }
+  .event-row .btn { margin-left: 0; }
+}

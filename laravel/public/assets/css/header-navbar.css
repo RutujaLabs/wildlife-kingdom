@@ -1,0 +1,378 @@
+/* ==========================================================================
+   Wildlife Kingdom — Header / Navbar
+   Premium royal African safari theme
+   Scoped to .site-header only — safe to load alongside style.css / home.css
+   ========================================================================== */
+
+:root {
+  --wk-forest:      #173B2A;
+  --wk-dark-green:  #0B2F22;
+  --wk-gold:        #D9A21B;
+  --wk-bright-gold: #E8B52A;
+  --wk-cream:       #F5E9CC;
+}
+
+/* -------------------------------------------------------------------------
+   Base header
+   ------------------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(160deg, var(--wk-forest) 0%, var(--wk-dark-green) 100%);
+  border-bottom: 1px solid rgba(217, 162, 27, 0.35);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.35s ease, background 0.35s ease;
+}
+
+/* thin gold "horizon" line under the header — the one bold accent */
+.site-header::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--wk-gold) 25%,
+    var(--wk-bright-gold) 50%,
+    var(--wk-gold) 75%,
+    transparent 100%
+  );
+  opacity: 0.85;
+}
+
+.site-header.is-scrolled {
+  box-shadow: 0 8px 24px rgba(11, 47, 34, 0.35);
+}
+
+/* -------------------------------------------------------------------------
+   Transparent variant — for use over a hero image (e.g. homepage only).
+   Starts see-through, becomes the solid forest-green header on scroll.
+   ------------------------------------------------------------------------- */
+
+.site-header--transparent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(11, 47, 34, 0.55) 0%, rgba(11, 47, 34, 0) 100%);
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+
+.site-header--transparent::after {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.site-header--transparent .main-nav a,
+.site-header--transparent .nav-toggle span {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+/* once scrolled, it becomes a normal sticky solid header */
+.site-header--transparent.is-scrolled {
+  position: sticky;
+  background: linear-gradient(160deg, var(--wk-forest) 0%, var(--wk-dark-green) 100%);
+  border-bottom-color: rgba(217, 162, 27, 0.35);
+}
+
+.site-header--transparent.is-scrolled::after {
+  opacity: 0.85;
+}
+
+.site-header--transparent.is-scrolled .main-nav a,
+.site-header--transparent.is-scrolled .nav-toggle span {
+  text-shadow: none;
+}
+
+/* on mobile, keep it solid from the start — a transparent bar over a
+   small hero image gets unreadable fast on narrow screens */
+@media (max-width: 900px) {
+  .site-header--transparent {
+    position: sticky;
+    background: linear-gradient(160deg, var(--wk-forest) 0%, var(--wk-dark-green) 100%);
+    border-bottom-color: rgba(217, 162, 27, 0.35);
+  }
+
+  .site-header--transparent::after {
+    opacity: 0.85;
+  }
+
+  .site-header--transparent .main-nav a,
+  .site-header--transparent .nav-toggle span {
+    text-shadow: none;
+  }
+}
+
+.site-header .header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* -------------------------------------------------------------------------
+   Logo
+   ------------------------------------------------------------------------- */
+
+.site-header .logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.site-header .logo img {
+  height: 56px;
+  width: auto;
+  display: block;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.site-header .logo:hover img {
+  filter: drop-shadow(0 0 10px rgba(232, 181, 42, 0.35));
+}
+
+/* -------------------------------------------------------------------------
+   Nav
+   ------------------------------------------------------------------------- */
+
+.site-header .main-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.site-header .main-nav ul {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-header .main-nav a {
+  position: relative;
+  display: inline-block;
+  padding: 10px 16px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--wk-cream);
+  text-decoration: none;
+  opacity: 0.92;
+  transition: opacity 0.25s ease, color 0.25s ease;
+}
+
+/* gold underline draws in from the center on hover/focus */
+.site-header .main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 0;
+  height: 2px;
+  background: var(--wk-bright-gold);
+  transform: translateX(-50%);
+  transition: width 0.28s ease;
+}
+
+.site-header .main-nav a:hover,
+.site-header .main-nav a:focus-visible {
+  color: var(--wk-bright-gold);
+  opacity: 1;
+}
+
+.site-header .main-nav a:hover::after,
+.site-header .main-nav a:focus-visible::after {
+  width: calc(100% - 32px);
+}
+
+/* -------------------------------------------------------------------------
+   CTA — Book Tickets
+   ------------------------------------------------------------------------- */
+
+.site-header .header-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--wk-dark-green);
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--wk-bright-gold) 0%, var(--wk-gold) 100%);
+  box-shadow: 0 2px 10px rgba(217, 162, 27, 0.25);
+  border: 1px solid rgba(245, 233, 204, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.site-header .header-cta:hover,
+.site-header .header-cta:focus-visible {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 20px rgba(232, 181, 42, 0.45);
+  transform: translateY(-1px);
+}
+
+.site-header .header-cta:active {
+  transform: translateY(0);
+}
+
+/* -------------------------------------------------------------------------
+   Mobile hamburger
+   ------------------------------------------------------------------------- */
+
+.site-header .nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.site-header .nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--wk-cream);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+}
+
+.site-header .nav-toggle:hover span {
+  background: var(--wk-bright-gold);
+}
+
+.site-header .nav-toggle.is-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.site-header .nav-toggle.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.site-header .nav-toggle.is-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* -------------------------------------------------------------------------
+   Responsive — tablet / mobile
+   ------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .site-header .header-inner {
+    height: 72px;
+    padding: 0 20px;
+    gap: 16px;
+  }
+
+  .site-header .logo img {
+    height: 44px;
+  }
+
+  .site-header .header-cta {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .site-header .nav-toggle {
+    display: flex;
+  }
+
+  .site-header .main-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    justify-content: stretch;
+    background: var(--wk-dark-green);
+    border-bottom: 1px solid rgba(217, 162, 27, 0.35);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+  }
+
+  .site-header .main-nav.is-open {
+    max-height: 560px;
+    opacity: 1;
+  }
+
+  .site-header .main-nav ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 20px 20px;
+  }
+
+  .site-header .main-nav li {
+    border-bottom: 1px solid rgba(217, 162, 27, 0.18);
+  }
+
+  .site-header .main-nav li:last-child {
+    border-bottom: none;
+  }
+
+  .site-header .main-nav a {
+    display: block;
+    padding: 16px 4px;
+    font-size: 16px;
+  }
+
+  .site-header .main-nav a::after {
+    display: none;
+  }
+
+  .site-header .main-nav a:hover,
+  .site-header .main-nav a:focus-visible {
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header .header-cta span,
+  .site-header .header-cta {
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Accessibility
+   ------------------------------------------------------------------------- */
+
+.site-header a:focus-visible,
+.site-header button:focus-visible {
+  outline: 2px solid var(--wk-bright-gold);
+  outline-offset: 3px;
+}
+
+body.wk-menu-open {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-header *,
+  .site-header *::after {
+    transition: none !important;
+  }
+}
