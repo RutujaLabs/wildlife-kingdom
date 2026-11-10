@@ -274,7 +274,7 @@ footer.site-footer .footer-bottom p {
     <div class="footer-links">
       <div class="fcol-head"><h4>Visit</h4></div>
       <ul>
-        <li><a href="contact.php">
+        <li><a href="http://localhost/wildlife-kingdom/public_html/tickets">
           <svg class="fc-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.2 14.3 14.3 3.2a1.6 1.6 0 0 1 2.2 0l1.3 1.3a2.4 2.4 0 0 0 3.7 3.7l.1.1a1.6 1.6 0 0 1 0 2.2L10.5 21.7a1.6 1.6 0 0 1-2.2 0l-1.3-1.3a2.4 2.4 0 0 0-3.7-3.7l-.1-.1a1.6 1.6 0 0 1 0-2.3z" transform="translate(0 -.4)"/><path d="m12.6 8.6 2.8 2.8" stroke-dasharray="1.6 2.2"/></svg>
           Tickets</a></li>
         <li><a href="contact.php">
