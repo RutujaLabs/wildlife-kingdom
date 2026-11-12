@@ -49,6 +49,7 @@ COPY laravel/storage ./storage
 COPY laravel/artisan ./artisan
 
 RUN composer dump-autoload --no-dev --no-interaction --no-scripts --optimize-autoloader \
+    && mkdir -p bootstrap/cache \
     && php artisan package:discover --ansi \
     && mkdir -p \
         /var/www/wildlife/uploads \
@@ -56,7 +57,6 @@ RUN composer dump-autoload --no-dev --no-interaction --no-scripts --optimize-aut
         storage/framework/sessions \
         storage/framework/views \
         storage/logs \
-        bootstrap/cache \
     && ln -s ../storage/app/public public/storage \
     && chown -R www-data:www-data \
         /var/www/wildlife/uploads \
