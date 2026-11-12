@@ -48,7 +48,7 @@ COPY laravel/routes ./routes
 COPY laravel/storage ./storage
 COPY laravel/artisan ./artisan
 
-RUN composer dump-autoload --no-dev --no-interaction --no-scripts --optimize-autoloader \
+RUN composer dump-autoload --no-dev --no-interaction --no-scripts --optimize \
     && mkdir -p bootstrap/cache \
     && php artisan package:discover --ansi \
     && mkdir -p \
