@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+database/
+laravel/database/
+uploads/
+laravel/vendor/
+laravel/node_modules/
+laravel/bootstrap/cache/*.php
+laravel/storage/logs/*
+laravel/storage/framework/cache/data/*
+laravel/storage/framework/sessions/*
+laravel/storage/framework/views/*
