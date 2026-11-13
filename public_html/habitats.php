@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/../includes/cloudinary_images.php';
 // ================= SEO SETTINGS (edit here) =================
 $pageTitle       = 'Habitats';
 $pageCss         = 'pages.css';
@@ -59,9 +60,7 @@ foreach ($queries as $sql) {
 
 /* Returns the image URL only if the file really exists, otherwise '' (shows a placeholder) */
 function hb_img($file) {
-  $file = basename((string)$file);
-  if ($file === '') return '';
-  return is_file(__DIR__ . '/../uploads/habitats/' . $file) ? '../uploads/habitats/' . rawurlencode($file) : '';
+  return wk_cloudinary_image_url($file, 'habitats');
 }
 function hb_e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 

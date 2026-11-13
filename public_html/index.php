@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/../includes/cloudinary_images.php';
 // ================= SEO SETTINGS (edit here) =================
 $pageTitle       = 'Home';
 $seoTitle        = 'Wildlife Kingdom | Zoo, Safari Park & Wildlife Experiences';
@@ -1396,7 +1397,7 @@ section.section.wk-habitats.wk-habitats {
           $animal = $animals[$i] ?? null;
           $fallback = $animalCardFallbacks[$i];
           $cardImage = $animal && !empty($animal['image'])
-              ? '../uploads/animals/' . rawurlencode($animal['image'])
+              ? wk_cloudinary_image_url($animal['image'], 'animals')
               : $fallback['image'];
           $cardAlt = $animal ? $animal['name'] : $fallback['alt'];
           $cardName = $animal ? $animal['name'] : $fallback['name'];

@@ -19,10 +19,7 @@
     $imgUrls = function ($item) {
         $path = $item->image ?? $item->image_path ?? $item->photo ?? $item->thumbnail ?? null;
         if (!$path) return [null, null];
-        if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) return [$path, null];
-        $clean = ltrim($path, '/');
-        if (\Illuminate\Support\Str::startsWith($clean, 'storage/')) return [asset($clean), asset(substr($clean, 8))];
-        return [asset('storage/' . $clean), asset($clean)];
+        return [app(\App\Services\CloudinaryImageService::class)->url($path, 'gallery'), null];
     };
 @endphp
 

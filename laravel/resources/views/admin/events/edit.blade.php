@@ -8,9 +8,7 @@
     $rawImg = $event->image_url ?? $event->image_path ?? $event->image ?? null;
     $imgSrc = null;
     if ($rawImg) {
-        $imgSrc = preg_match('#^(https?:)?//#', $rawImg) || str_starts_with($rawImg, '/')
-            ? $rawImg
-            : asset('storage/' . ltrim($rawImg, '/'));
+        $imgSrc = app(\App\Services\CloudinaryImageService::class)->url($rawImg, 'events');
     }
     $status = strtolower(old('status', $event->status));
 @endphp

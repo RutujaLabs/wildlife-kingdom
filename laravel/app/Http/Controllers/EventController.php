@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Services\CloudinaryImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -91,10 +91,6 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        if ($event->image) {
-            Storage::disk('legacy_uploads')->delete('events/'.basename($event->image));
-        }
-
         $event->delete();
 
         return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully.');
@@ -103,13 +99,9 @@ class EventController extends Controller
     protected function handleImageUpload(Request $request, ?string $currentImage = null): ?string
     {
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('events', 'legacy_uploads');
+            $filename = app(CloudinaryImageService::class)->store($request->file('image'), 'events');
 
-            if ($currentImage) {
-                Storage::disk('legacy_uploads')->delete('events/'.basename($currentImage));
-            }
-
-            return basename($path);
+            return $filename;
         }
 
         return $currentImage;

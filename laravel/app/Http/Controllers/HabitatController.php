@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Habitat;
+use App\Services\CloudinaryImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HabitatController extends Controller
 {
@@ -89,10 +89,6 @@ class HabitatController extends Controller
 
     public function destroy(Habitat $habitat)
     {
-        if ($habitat->image) {
-            Storage::disk('legacy_uploads')->delete('habitats/'.basename($habitat->image));
-        }
-
         $habitat->delete();
 
         return redirect()->route('admin.habitats.index')->with('success', 'Habitat deleted successfully.');
@@ -101,13 +97,9 @@ class HabitatController extends Controller
     protected function handleImageUpload(Request $request, ?string $currentImage = null): ?string
     {
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('habitats', 'legacy_uploads');
+            $filename = app(CloudinaryImageService::class)->store($request->file('image'), 'habitats');
 
-            if ($currentImage) {
-                Storage::disk('legacy_uploads')->delete('habitats/'.basename($currentImage));
-            }
-
-            return basename($path);
+            return $filename;
         }
 
         return $currentImage;

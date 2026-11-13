@@ -199,7 +199,7 @@
                 // fall through to default below
             }
 
-            return asset('uploads/' . $rel);
+            return app(\App\Services\CloudinaryImageService::class)->url($file, $dir);
         }
     }
 

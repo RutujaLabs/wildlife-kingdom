@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/../includes/cloudinary_images.php';
 // ================= SEO SETTINGS (edit here) =================
 $pageTitle       = 'Gallery';
 $pageCss         = 'pages.css';
@@ -58,12 +59,6 @@ $galleryDebug = [];
    (server folder  =>  browser URL). Admin panel ka upload folder
    alag ho to bas yahan ek line add kar do.
 ================================================================== */
-$imageLocations = [
-  [__DIR__ . '/../uploads/gallery/', '../uploads/gallery/'],
-  [__DIR__ . '/../uploads/',         '../uploads/'],
-  // [__DIR__ . '/../admin/public/storage/', '../admin/public/storage/'],   // example
-];
-
 try {
   $tables = [];
   $tr = $conn->query("SHOW TABLES");
@@ -113,16 +108,7 @@ try {
         $val = trim((string)($row[$cImg] ?? ''));
         if ($val === '') { $galleryDebug['no_image_value'] = ($galleryDebug['no_image_value'] ?? 0) + 1; continue; }
 
-        $src = '';
-        if (preg_match('#^https?://#i', $val)) {
-          $src = $val;
-        } else {
-          foreach ($imageLocations as $loc) {
-            foreach ([ltrim($val, '/'), basename($val)] as $rel) {
-              if (is_file($loc[0] . $rel)) { $src = $loc[1] . $rel; break 2; }
-            }
-          }
-        }
+        $src = wk_cloudinary_image_url($val, 'gallery');
         if ($src === '') { $galleryDebug['file_not_found'][] = $val; continue; }
 
         $gallery[] = [
@@ -270,7 +256,7 @@ foreach ($gallery as $row) {
   foreach ($groups as $g) { $counts[$g]++; }
 
   $items[] = [
-    'src'    => $row['_src'] ?? ('../uploads/gallery/' . $row['image']),
+    'src'    => $row['_src'] ?? wk_cloudinary_image_url($row['image'], 'gallery'),
     'title'  => $title !== '' ? $title : ($species !== '' ? $species : 'Wildlife'),
     'alt'    => trim($row['alt'] ?? '') !== '' ? trim($row['alt']) : ($title !== '' ? $title : 'Wildlife'),
     'sub'    => $sub,

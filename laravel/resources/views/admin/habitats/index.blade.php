@@ -142,7 +142,7 @@
         if (empty($path)) return null;
         if (preg_match('#^(https?:)?//#', $path)) return $path;
         $path = ltrim($path, '/');
-        return file_exists(public_path($path)) ? asset($path) : asset('storage/' . $path);
+        return app(\App\Services\CloudinaryImageService::class)->url($path, 'habitats');
     };
     $regionOf = fn ($h) => $pick($h, ['region', 'location', 'geographical_range', 'country', 'continent']);
     $typeOf   = fn ($h) => $pick($h, ['type', 'ecosystem', 'category']) ?? $h->name;

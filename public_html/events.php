@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/../includes/cloudinary_images.php';
 // ================= SEO SETTINGS (edit here) =================
 $pageTitle       = 'Events';
 $pageCss         = 'pages.css';
@@ -58,13 +59,7 @@ if ($result) {
 if (!function_exists('ev_image_url')) {
     function ev_image_url($row) {
         $img = trim((string)($row['image'] ?? $row['image_path'] ?? ''));
-        if ($img === '') return '';
-        if (preg_match('#^https?://#i', $img)) return $img;
-        $img = ltrim($img, '/');
-        if (strpos($img, 'uploads/') === 0) {
-            return '../' . implode('/', array_map('rawurlencode', explode('/', $img)));
-        }
-        return '../uploads/events/' . rawurlencode(basename($img));
+        return wk_cloudinary_image_url($img, 'events');
     }
 }
 

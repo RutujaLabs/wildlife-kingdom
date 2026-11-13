@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/../includes/cloudinary_images.php';
 // ================= SEO SETTINGS (edit here) =================
 $pageTitle       = 'Animals';
 $pageCss         = 'animals.css';
@@ -270,7 +271,7 @@ require '../includes/header.php';
             <article class="an-card" data-cat="<?= an_e($catKey) ?>" data-name="<?= an_e($search) ?>">
               <div class="an-card-img">
                 <?php if (!empty($animal['image'])): ?>
-                  <img src="../uploads/animals/<?= an_e(rawurlencode($animal['image'])) ?>"
+                  <img src="<?= an_e(wk_cloudinary_image_url($animal['image'], 'animals')) ?>"
                        alt="<?= an_e($animal['name']) ?>" loading="lazy" onerror="this.style.display='none'">
                 <?php endif; ?>
               </div>

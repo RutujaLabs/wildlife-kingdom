@@ -141,7 +141,7 @@
         if (empty($path)) return null;
         if (preg_match('#^(https?:)?//#', $path)) return $path;
         $path = ltrim($path, '/');
-        return file_exists(public_path($path)) ? asset($path) : asset('storage/' . $path);
+        return app(\App\Services\CloudinaryImageService::class)->url($path, 'animals');
     };
 
     $totalAnimals = $isPaginator ? $animals->total() : count($animals);

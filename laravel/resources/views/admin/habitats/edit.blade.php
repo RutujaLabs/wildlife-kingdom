@@ -8,9 +8,7 @@
     // Current image URL (path adjust karna ho to yahan change karo)
     $currentImage = null;
     if (!empty($habitat->image)) {
-        $currentImage = \Illuminate\Support\Str::startsWith($habitat->image, ['http://', 'https://', '/'])
-            ? $habitat->image
-            : asset('storage/' . ltrim($habitat->image, '/'));
+        $currentImage = app(\App\Services\CloudinaryImageService::class)->url($habitat->image, 'habitats');
     }
 @endphp
 

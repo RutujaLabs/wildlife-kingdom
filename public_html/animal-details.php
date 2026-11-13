@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/../includes/cloudinary_images.php';
 $pageCss = 'animals.css';
 require '../config/db.php';
 require '../includes/functions.php';
@@ -15,13 +16,8 @@ function ad_f($row, $keys, $default = '') {
     return $default;
 }
 /* file name / path stored in the DB  ->  web path */
-function ad_path($f) {
-    $f = trim((string)$f);
-    if ($f === '') return '';
-    if (preg_match('#^(https?:)?//#i', $f) || $f[0] === '/' || strpos($f, '../') === 0) return $f;
-    if (strpos($f, 'uploads/') === 0) return '../' . $f;
-    if (strpos($f, '/') !== false) return '../' . $f;
-    return '../uploads/animals/' . rawurlencode($f);
+function ad_path($f, $folder = 'animals') {
+    return wk_cloudinary_image_url($f, $folder);
 }
 /* Apni (manual) images: assets/images/static/ me rakho. File mil jaye to path apne aap ban jata hai.
    Pehle us animal ke slug wala naam dekhta hai (e.g. animal-details-banner-giraffe.webp), phir common naam
@@ -195,7 +191,7 @@ if ($animal) {
             }
             if ($imgCol) {
                 foreach ($rows as $r) {
-                    if (trim((string)$r[$imgCol]) !== '') $gallery[] = ['src' => ad_path($r[$imgCol]), 'alt' => ad_f($r, ['alt_text', 'alt', 'caption', 'title'], $name)];
+                    if (trim((string)$r[$imgCol]) !== '') $gallery[] = ['src' => ad_path($r[$imgCol], 'animals/gallery'), 'alt' => ad_f($r, ['alt_text', 'alt', 'caption', 'title'], $name)];
                 }
             }
         }
@@ -205,7 +201,7 @@ if ($animal) {
             if (!empty($animal[$k])) {
                 foreach (ad_list($animal[$k]) as $it) {
                     $f = is_array($it) ? ad_f($it, ['image', 'file', 'path', 'url', 'src', 'filename']) : $it;
-                    if ($f !== '') $gallery[] = ['src' => ad_path($f), 'alt' => is_array($it) ? ad_f($it, ['alt', 'alt_text'], $name) : $name];
+                    if ($f !== '') $gallery[] = ['src' => ad_path($f, 'animals/gallery'), 'alt' => is_array($it) ? ad_f($it, ['alt', 'alt_text'], $name) : $name];
                 }
                 break;
             }

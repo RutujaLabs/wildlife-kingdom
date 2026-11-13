@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Services\CloudinaryImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -36,7 +36,7 @@ class GalleryController extends Controller
             'status' => ['required', 'in:published,draft'],
         ]);
 
-        $validated['image'] = $this->handleImageUpload($request);
+        $validated['image'] = $this->handleImageUpload($request, null);
         $validated['is_homepage_visible'] = $request->boolean('is_homepage_visible', true);
 
         Gallery::create($validated);
@@ -75,10 +75,6 @@ class GalleryController extends Controller
 
     public function destroy(Gallery $gallery)
     {
-        if ($gallery->image) {
-            Storage::disk('legacy_uploads')->delete('gallery/'.basename($gallery->image));
-        }
-
         $gallery->delete();
 
         return redirect()->route('admin.gallery.index')->with('success', 'Gallery image deleted successfully.');
@@ -87,13 +83,9 @@ class GalleryController extends Controller
     protected function handleImageUpload(Request $request, ?string $currentImage = null): ?string
     {
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('gallery', 'legacy_uploads');
+            $filename = app(CloudinaryImageService::class)->store($request->file('image'), 'gallery');
 
-            if ($currentImage) {
-                Storage::disk('legacy_uploads')->delete('gallery/'.basename($currentImage));
-            }
-
-            return basename($path);
+            return $filename;
         }
 
         return $currentImage;

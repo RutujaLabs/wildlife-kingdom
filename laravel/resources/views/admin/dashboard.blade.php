@@ -184,7 +184,7 @@
             foreach ($candidates as $c) {
                 if (is_file($c[0])) return asset($c[1]);
             }
-            return asset(strpos($path, 'storage/') === 0 ? $path : 'storage/' . $path);
+            return app(\App\Services\CloudinaryImageService::class)->url($raw, 'animals');
         }
     }
 

@@ -6,9 +6,9 @@ use App\Models\Animal;
 use App\Models\AnimalFaq;
 use App\Models\AnimalImage;
 use App\Models\Habitat;
+use App\Services\CloudinaryImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
@@ -107,10 +107,10 @@ foreach ($optionalFields as $field) {
         $validated['slug'] = $this->resolveSlug($validated['slug'] ?? null, $validated['name'], $animal);
         $this->setCheckboxValues($validated, $request);
 
-        $filesToDelete = DB::transaction(function () use ($animal, $validated, $existingFaqs, $newFaqs, $existingImages, $newGalleryMetadata, $relatedAnimalIds, $request) {
+        DB::transaction(function () use ($animal, $validated, $existingFaqs, $newFaqs, $existingImages, $newGalleryMetadata, $relatedAnimalIds, $request) {
             $animal->update($validated);
             $this->syncFaqs($animal, $existingFaqs, $newFaqs);
-            $filesToDelete = $this->syncImages(
+            $this->syncImages(
                 $animal,
                 $existingImages,
                 $request->file('new_gallery_images', []),
@@ -123,29 +123,14 @@ foreach ($optionalFields as $field) {
                 ->values()
                 ->all());
 
-            return $filesToDelete;
         });
-
-        foreach ($filesToDelete as $path) {
-            Storage::disk('legacy_uploads')->delete($path);
-        }
 
         return redirect()->route('admin.animals.index')->with('success', 'Animal updated successfully.');
     }
 
     public function destroy(Animal $animal)
     {
-        $image = $animal->image;
-        $galleryImages = $animal->images()->get();
         $animal->delete();
-
-        if ($image) {
-            Storage::disk('legacy_uploads')->delete('animals/'.basename($image));
-        }
-
-        foreach ($galleryImages as $galleryImage) {
-            Storage::disk('legacy_uploads')->delete('animals/gallery/'.basename($galleryImage->image));
-        }
 
         return redirect()->route('admin.animals.index')->with('success', 'Animal deleted successfully.');
     }
@@ -278,15 +263,12 @@ foreach ($optionalFields as $field) {
         }
     }
 
-    protected function syncImages(Animal $animal, array $existingImages, array $newFiles, array $newMetadata): array
+    protected function syncImages(Animal $animal, array $existingImages, array $newFiles, array $newMetadata): void
     {
-        $filesToDelete = [];
-
         foreach ($existingImages as $id => $data) {
             $image = $animal->images()->findOrFail($id);
 
             if (! empty($data['remove'])) {
-                $filesToDelete[] = 'animals/gallery/'.basename($image->image);
                 $image->delete();
                 continue;
             }
@@ -304,10 +286,10 @@ foreach ($optionalFields as $field) {
                 continue;
             }
 
-            $path = $data['file']->store('animals/gallery', 'legacy_uploads');
+            $filename = app(CloudinaryImageService::class)->store($data['file'], 'animals/gallery');
             $metadata = $newMetadata[$index] ?? [];
             $animal->images()->create([
-                'image' => basename($path),
+                'image' => $filename,
                 'alt_text' => $metadata['alt_text'] ?? null,
                 'caption' => $metadata['caption'] ?? null,
                 'credit' => $metadata['credit'] ?? null,
@@ -316,19 +298,14 @@ foreach ($optionalFields as $field) {
             ]);
         }
 
-        return $filesToDelete;
     }
 
     protected function handleImageUpload(Request $request, ?string $currentImage = null): ?string
     {
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('animals', 'legacy_uploads');
+            $filename = app(CloudinaryImageService::class)->store($request->file('image'), 'animals');
 
-            if ($currentImage) {
-                Storage::disk('legacy_uploads')->delete('animals/'.basename($currentImage));
-            }
-
-            return basename($path);
+            return $filename;
         }
 
         return $currentImage;
